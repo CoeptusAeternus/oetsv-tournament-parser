@@ -14,7 +14,6 @@ def getIds(url):
     ids=[]
 
     for link in soup.find_all('a'):
-        print(link)
         l=link.get('href')
         if 'TKNr=' in l:
             id=findTKNr(l)
