@@ -57,6 +57,12 @@ def getData(id):
         if adr=="":
             adr=re.sub('%20',' ',search_term)
 
+        wr_search=re.sub('(.|\\n)*Wertungsrichter','\n ',soup.text)
+        wr_match=re.finditer("\\n([A-Z]\s+-)?((\s|-)+(\w|[äöüÄÖÜ])+){2,}\s*(,|/)\s+(\w|[äöüÄÖÜ])+\\n",wr_search)
+        wr_str=[]
+        for x in wr_match:
+            wr_str.append(re.sub(' /',',',re.sub('\n\s*([A-Z]\s+-)?','',x.group(0))))
+
         #in Dict für JSON
         ret_dict = {
             'id':id,
@@ -65,6 +71,7 @@ def getData(id):
             'klassen':klassen,
             'nenngeld':nenngeld,
             'adresse':adr,
+            'wr':wr_str,
         }
 
         return ret_dict
