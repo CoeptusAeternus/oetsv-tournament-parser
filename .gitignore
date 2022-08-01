@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 requirements.txt
 testing.ipynb
-oetsv_package\login.py
+oetsv_package/login.py
