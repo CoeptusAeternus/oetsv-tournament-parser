@@ -1,14 +1,19 @@
 from flask import Flask, jsonify
 from oetsv_package.getIds import getIds
 from oetsv_package.getData import getData
+from oetsv_package.getList import getList
 
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
-    return "<p>api at /oetsv_kalender</p>"
+def landing():
+    return "<p>api at <a href=\"/oetsv_kalender\" title=\"api\">/oetsv_kalender</a></p>"
 
 @app.route('/oetsv_kalender')
+def api_overview():
+    return "<a href=\"/oetsv_kalender/all\" title=\"app\">all</a><br><a href=\"/oetsv_kalender/list\" title=\"api\">list</a><br>"
+
+@app.route('/oetsv_kalender/all')
 def oetsv_json():
     url = 'https://www.tanzsportverband.at/kalender/daten.html'
     json_data = []
@@ -18,3 +23,8 @@ def oetsv_json():
             json_data.append(d)
 
     return jsonify(json_data)
+
+@app.route('/oetsv_kalender/list')
+def list():
+    url = 'https://www.tanzsportverband.at/kalender/daten.html'
+    return jsonify(getList(url))
