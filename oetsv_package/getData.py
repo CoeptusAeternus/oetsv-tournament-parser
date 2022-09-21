@@ -12,7 +12,7 @@ def getData(id):
     html_request = requests.get("https://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr="+str(id)+"&art=IN&conf_html=1")
 
 
-    if html_request.status_code == 200:
+    if html_request.status_code == 200 and requests.get("https://www.tanzsportverband.at/modules/ext-data/turniere/oetsv_turniere_"+str(id)+".csv").status_code == 200:
 
 
         df=pd.read_csv("https://www.tanzsportverband.at/modules/ext-data/turniere/oetsv_turniere_"+str(id)+".csv",sep=';',encoding='iso-8859-1')
@@ -46,16 +46,7 @@ def getData(id):
         for i in a_tags:
             links.append(i['href'])
 
-        link_str='-'.join([str(elem) for elem in links])
-        search_term=re.sub('q=','',re.sub('\s+|\+','%20',re.search("q=(\w|\s|\+|\.)+",link_str).group(0)))
-        adr_response=json.loads(requests.get("https://nominatim.openstreetmap.org/search?q="+search_term+"&format=json").text)
-        adr=""
-        for a in adr_response:
-            if re.search('Österreich',a['display_name']):
-                adr=a['display_name']
-                break
-        if adr=="":
-            adr=re.sub('%20',' ',search_term)
+        adr=table[6].text.split('  ->')[0]
 
         wr_search=re.sub('(.|\\n)*Wertungsrichter','\n ',soup.text)
         wr_match=re.finditer("\\n([A-Z]\s+-)?((\s|-)+(\w|[äöüÄÖÜ])+){2,}\s*(,|/)\s+(\w|[äöüÄÖÜ])+\\n",wr_search)

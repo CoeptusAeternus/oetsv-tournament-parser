@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, abort
 from oetsv_package.getIds import getIds
 from oetsv_package.getData import getData
 from oetsv_package.getList import getList
@@ -28,3 +28,14 @@ def oetsv_json():
 def list():
     url = 'https://www.tanzsportverband.at/kalender/daten.html'
     return jsonify(getList(url))
+
+@app.route('/oetsv_kalender/<id>')
+def tournament(id):
+    data=getData(id)
+    if data != 404:
+        return jsonify(getData(id))
+    abort(404)
+
+@app.errorhandler(404)
+def not_found(e):
+    return {'error':404, 'message':'id not found',},404
