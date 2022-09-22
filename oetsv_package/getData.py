@@ -2,26 +2,35 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 import re
-import json
+import io
 
 pd.set_option('display.max_colwidth', None)
 
 def getData(id):
 
-    #request Ausschreibungs HTML
-    html_request = requests.get("https://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr="+str(id)+"&art=IN&conf_html=1")
+    #request Ausschreibungs HTML&CSV
+    html_response = requests.get("https://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr="+str(id)+"&art=IN&conf_html=1")
+    csv_response = requests.get("https://www.tanzsportverband.at/modules/ext-data/turniere/oetsv_turniere_"+str(id)+".csv")
 
+    if html_response.status_code == 200 and csv_response.status_code == 200:
 
-    if html_request.status_code == 200 and requests.get("https://www.tanzsportverband.at/modules/ext-data/turniere/oetsv_turniere_"+str(id)+".csv").status_code == 200:
+        df=pd.read_csv(io.StringIO(csv_response.text),sep=';',encoding='iso-8859-1')
 
-
-        df=pd.read_csv("https://www.tanzsportverband.at/modules/ext-data/turniere/oetsv_turniere_"+str(id)+".csv",sep=';',encoding='iso-8859-1')
-
-        soup = BeautifulSoup(html_request.text, 'html.parser')
+        soup = BeautifulSoup(html_response.text, 'html.parser')
 
         bezeichnung=df.get('nr').where(df.get('nr').str.find('TURNIERBEZEICHNUNG')==0).dropna().to_string().split('=')[1]
 
         datum=df.get('nr').where(df.get('nr').str.find('DATUM')==0).dropna().to_string().split('=')[1]
+        #format date fpr iso
+        date_comp=datum.split('-')
+        t1 = date_comp[1]
+        t2 = date_comp[2]
+        if int(t1) < 10:
+            date_comp[1]='0'+date_comp[1]
+        if int(t2) < 10:
+            date_comp[2]='0'+date_comp[2]
+        datum=date_comp[0]+"-"+date_comp[1]+"-"+date_comp[2]
+
         zeit=re.sub(' Uhr','',re.search("\d\d?(|:\d\d) Uhr",soup.text).group(0))+":00"
 
         nenngeld_suche=re.search("Nenngeld:(\s|\w|€)*\d+(,(\d{2}|-)|)",soup.text)
