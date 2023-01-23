@@ -10,28 +10,24 @@ def getData(id):
 
     #request Ausschreibungs HTML&CSV
     html_response = requests.get("https://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr="+str(id)+"&art=IN&conf_html=1")
-    csv_response = requests.get("https://www.tanzsportverband.at/modules/ext-data/turniere/oetsv_turniere_"+str(id)+".csv")
 
-    if html_response.status_code == 200 and csv_response.status_code == 200:
-
-        df=pd.read_csv(io.StringIO(csv_response.text),sep=';',encoding='iso-8859-1')
+    if html_response.status_code == 200:
 
         soup = BeautifulSoup(html_response.text, 'html.parser')
 
-        bezeichnung=df.get('nr').where(df.get('nr').str.find('TURNIERBEZEICHNUNG')==0).dropna().to_string().split('=')[1]
+        bezeichnung=soup.find('table').find_all('tr')[3].find_all('td')[4].getText()
 
-        datum=df.get('nr').where(df.get('nr').str.find('DATUM')==0).dropna().to_string().split('=')[1]
-        #format date fpr iso
-        date_comp=datum.split('-')
-        t1 = date_comp[1]
-        t2 = date_comp[2]
-        if int(t1) < 10:
-            date_comp[1]='0'+date_comp[1]
-        if int(t2) < 10:
-            date_comp[2]='0'+date_comp[2]
-        datum=date_comp[0]+"-"+date_comp[1]+"-"+date_comp[2]
+        datetimeField=soup.find('table').find_all('tr')[3].find_all('td')[8].getText()
+        datetimeField=re.sub(' Uhr','',datetimeField)
+        datetimeField=re.sub('[a-zA-Z]{2}., ',"", datetimeField)
+        datetimeField=re.sub(', ',"T", datetimeField)
+        datetimeField=re.sub('\A\d{1}\.',addLeading0Day, datetimeField)
+        datetimeField=re.sub('\. {1}\d\.',addLeading0Month, datetimeField)
+        datetimeField=re.sub(' \d{2,4}',formatYear, datetimeField)
+        datetimeField=datetimeField+":00"
+        datetimeField
 
-        zeit=re.sub(' Uhr','',re.search("\d\d?(|:\d\d) Uhr",soup.text).group(0))+":00"
+
 
         nenngeld_suche=re.search("Nenngeld:(\s|\w|€)*\d+(,(\d{2}|-)|)",soup.text)
         if nenngeld_suche:
@@ -67,7 +63,7 @@ def getData(id):
         ret_dict = {
             'id':id,
             'bezeichnung': bezeichnung,
-            'datum':datum+'T'+zeit,
+            'datum':datetimeField,
             'klassen':klassen,
             'nenngeld':nenngeld,
             'adresse':adr,
@@ -77,3 +73,24 @@ def getData(id):
         return ret_dict
     
     return 404
+
+
+
+def addLeading0Day(param):
+    if(len(param.group(0)) == 2):
+        return "0"+param.group(0)
+    else:
+        return param.group(0)
+
+def addLeading0Month(param):
+    if(len(param.group(0)) == 4):
+        return re.sub(' ','0',param.group(0))
+    else:
+        return param.group(0)
+
+def formatYear(param):
+    if(len(param.group(0)) == 3):
+        return re.sub(' ','20',param.group(0))
+    elif(len(param.group(0)) == 5):
+        return re.sub(' ','',param.group(0))
+    return param.group(0)
