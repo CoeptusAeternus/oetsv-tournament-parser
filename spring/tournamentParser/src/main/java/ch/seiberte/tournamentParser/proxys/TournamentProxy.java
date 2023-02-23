@@ -2,6 +2,7 @@ package ch.seiberte.tournamentParser.proxys;
 
 import ch.seiberte.tournamentParser.IKalenderReader;
 import ch.seiberte.tournamentParser.ITournamentReader;
+import ch.seiberte.tournamentParser.OetsvTournamentDataParser;
 import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 
@@ -19,7 +20,7 @@ public class TournamentProxy implements ITournamentReader {
     public TournamentProxy() {
         this.currentTournaments=new HashMap<>();
         this.tournamentsArchive=new HashMap<>();
-        this.baseService=null;//TODO
+        this.baseService=new OetsvTournamentDataParser();//TODO
     }
 
     @Override

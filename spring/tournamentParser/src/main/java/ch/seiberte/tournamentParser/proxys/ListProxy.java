@@ -1,6 +1,7 @@
 package ch.seiberte.tournamentParser.proxys;
 
 import ch.seiberte.tournamentParser.IKalenderReader;
+import ch.seiberte.tournamentParser.data.KalenderParser;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 
 import java.util.Collection;
@@ -14,7 +15,7 @@ public class ListProxy implements IKalenderReader {
 
     public ListProxy() {
         this.currentList=new HashMap<>();
-        this.baseService=null;//TODO
+        this.baseService=new KalenderParser();//TODO
     }
 
     @Override

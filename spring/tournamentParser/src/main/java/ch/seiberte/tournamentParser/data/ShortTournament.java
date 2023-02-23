@@ -29,4 +29,9 @@ public class ShortTournament extends BaseTournament{
             return super.equals(obj) && start.equals(((ShortTournament) obj).getStart());
         return false;
     }
+
+    @Override
+    public String toString(){
+        return "id: " + getId().toString()+", bez: "+getBezeichnung()+", start: "+getStart().toString();
+    }
 }
