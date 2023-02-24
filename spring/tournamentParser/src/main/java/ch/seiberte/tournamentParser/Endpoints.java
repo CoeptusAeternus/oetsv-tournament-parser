@@ -14,6 +14,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,23 +50,44 @@ public class Endpoints {
     }
 
     @RequestMapping(value = "/oetsv_kalender/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Collection<ShortTournament> returnList(){
+    public Collection<ShortTournament> returnList() {
         logger.info("request at /oetsv_kalender/list");
         return kr.getTournaments();
     }
 
     @RequestMapping(value = "/oetsv_kalender/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public LongTournament returnTournament(@Validated @PathVariable String tournamentId){
-        logger.debug("providing Tournament: {}",tournamentId);
+    public LongTournament returnTournament(@Validated @PathVariable String tournamentId) {
+        logger.debug("providing Tournament: {}", tournamentId);
         return tr.readTournament(Long.valueOf(tournamentId));
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler({EmptyTournamentException.class})
-    public Map<String,String> handleExcpeiton(EmptyTournamentException ex){
-        Map<String,String> errorMap = new HashMap<>();
-        errorMap.put("status",HttpStatus.BAD_REQUEST.value()+"");
-        errorMap.put("message",ex.getMessage());
+    public Map<String, String> handleExcpeiton(EmptyTournamentException ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("status", HttpStatus.BAD_REQUEST.value() + "");
+        errorMap.put("message", ex.getMessage());
+        return errorMap;
+    }
+
+    @RequestMapping(value = "/error", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, String> handleError(HttpServletRequest request) {
+        Map<String, String> errorMap = new HashMap<>();
+
+        Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        if (status != null)
+            errorMap.put("status", status.toString());
+
+        Object uri = request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+        if (uri != null)
+            errorMap.put("uri", uri.toString());
+
+        Object message = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
+        if (message != null)
+            errorMap.put("message", message.toString());
+
+        logger.warn("Error: {}", errorMap);
+
         return errorMap;
     }
 
@@ -72,7 +95,7 @@ public class Endpoints {
     public void updateCollectionAndMap() {
         logger.info("updating all tournaments");
         Collection<ShortTournament> cst = kr.getTournaments();
-        for(ShortTournament st : cst)
+        for (ShortTournament st : cst)
             tr.readTournament(st.getId());
 
     }
