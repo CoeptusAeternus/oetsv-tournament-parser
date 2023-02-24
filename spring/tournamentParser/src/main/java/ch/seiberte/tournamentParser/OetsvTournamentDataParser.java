@@ -1,12 +1,12 @@
 package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.LongTournament;
+import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -17,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OetsvTournamentDataParser implements ITournamentReader {
-    private static Logger logger = LoggerFactory.getLogger(OetsvTournamentDataParser.class);
     private static final String urlPart1 = "https://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr=";
     private static final String urlPart2 = "&art=IN&conf_html=1";
 
@@ -50,9 +49,9 @@ public class OetsvTournamentDataParser implements ITournamentReader {
         List<String> klassen = new ArrayList<>();
         Element klassenTable = dataBody.select("td").last();
         Elements klassenElements = klassenTable.getElementsByTag("b");
-        for(int i = 0; i<klassenElements.size();i++) {
-            String rawKlassenString = klassenElements.get(i).text();
-            String klassenString = rawKlassenString.substring(0,rawKlassenString.length()-5);
+        for (Element klassenElement : klassenElements) {
+            String rawKlassenString = klassenElement.text();
+            String klassenString = rawKlassenString.substring(0, rawKlassenString.length() - 5);
             klassen.add(klassenString);
         }
 

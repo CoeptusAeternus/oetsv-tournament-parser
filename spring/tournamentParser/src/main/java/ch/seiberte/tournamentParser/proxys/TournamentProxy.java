@@ -1,34 +1,28 @@
 package ch.seiberte.tournamentParser.proxys;
 
-import ch.seiberte.tournamentParser.IKalenderReader;
 import ch.seiberte.tournamentParser.ITournamentReader;
 import ch.seiberte.tournamentParser.OetsvTournamentDataParser;
 import ch.seiberte.tournamentParser.data.LongTournament;
-import ch.seiberte.tournamentParser.data.ShortTournament;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class TournamentProxy implements ITournamentReader {
 
-    Map<Long, LongTournament> currentTournaments;
-    Map<Long,LongTournament> tournamentsArchive;
-    ITournamentReader baseService;
+    private Map<Long, LongTournament> tournamentCache;
+    private final ITournamentReader baseService;
 
     public TournamentProxy() {
-        this.currentTournaments=new HashMap<>();
-        this.tournamentsArchive=new HashMap<>();
+        this.tournamentCache =new HashMap<>();
         this.baseService=new OetsvTournamentDataParser();
     }
 
     @Override
     public LongTournament readTournament(Long id) {
-        if(currentTournaments.containsKey(id))
-            return currentTournaments.get(id);
-        if(tournamentsArchive.containsKey(id))
-            return tournamentsArchive.get(id);
-        return baseService.readTournament(id);
+        if(tournamentCache.containsKey(id))
+            return tournamentCache.get(id);
+        LongTournament newTournament = baseService.readTournament(id);
+        tournamentCache.put(newTournament.getId(), newTournament);
+        return newTournament;
     }
 }

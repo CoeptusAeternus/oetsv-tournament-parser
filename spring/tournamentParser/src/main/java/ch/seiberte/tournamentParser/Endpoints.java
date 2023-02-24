@@ -2,6 +2,9 @@ package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.data.ShortTournament;
+import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
+import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
+import ch.seiberte.tournamentParser.exceptions.UnableToReadDataExcpetion;
 import ch.seiberte.tournamentParser.proxys.ListProxy;
 import ch.seiberte.tournamentParser.proxys.TournamentProxy;
 import org.slf4j.Logger;
@@ -58,15 +61,36 @@ public class Endpoints {
     @RequestMapping(value = "/oetsv_kalender/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public LongTournament returnTournament(@Validated @PathVariable String tournamentId) {
         logger.debug("providing Tournament: {}", tournamentId);
+        if(tournamentId.equals("418"))
+            throw new IAmATeapotException();
+
         return tr.readTournament(Long.valueOf(tournamentId));
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler({EmptyTournamentException.class})
-    public Map<String, String> handleExcpeiton(EmptyTournamentException ex) {
+    public Map<String, String> handleEmptyTournamentException(EmptyTournamentException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("status", HttpStatus.BAD_REQUEST.value() + "");
         errorMap.put("message", ex.getMessage());
+        return errorMap;
+    }
+
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler({UnableToReadDataExcpetion.class})
+    public Map<String, String> handleUnableToReadTournamentException(EmptyTournamentException ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value() + "");
+        errorMap.put("message", ex.getMessage());
+        return errorMap;
+    }
+
+    @ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT)
+    @ExceptionHandler({IAmATeapotException.class})
+    public Map<String, String> handleTeapot() {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("status", HttpStatus.I_AM_A_TEAPOT.value()+"");
+        errorMap.put("message", "Unable to provide Coffee - Available selection includes Yorkshire Tea, Green Tea and fruit tea");
         return errorMap;
     }
 
@@ -91,7 +115,7 @@ public class Endpoints {
         return errorMap;
     }
 
-    @Scheduled(fixedRate = 3600000)//TODO update to 3600000 (once per hour)
+    @Scheduled(fixedRate = 3600000)
     public void updateCollectionAndMap() {
         logger.info("updating all tournaments");
         Collection<ShortTournament> cst = kr.getTournaments();

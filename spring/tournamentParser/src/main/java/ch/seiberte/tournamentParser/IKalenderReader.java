@@ -6,6 +6,6 @@ import java.util.Collection;
 
 public interface IKalenderReader {
 
-    public Collection<ShortTournament> getTournaments();
+    Collection<ShortTournament> getTournaments();
 
 }

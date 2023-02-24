@@ -1,4 +1,4 @@
-package ch.seiberte.tournamentParser;
+package ch.seiberte.tournamentParser.exceptions;
 
 public class EmptyTournamentException extends RuntimeException{
 

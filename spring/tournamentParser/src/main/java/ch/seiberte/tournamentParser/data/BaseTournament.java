@@ -1,7 +1,7 @@
 package ch.seiberte.tournamentParser.data;
 
 public abstract class BaseTournament {
-    private Long id;
+    private final Long id;
     private String bezeichnung;
 
     public BaseTournament(Long id, String bezeichnung) {
@@ -16,10 +16,6 @@ public abstract class BaseTournament {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getBezeichnung() {

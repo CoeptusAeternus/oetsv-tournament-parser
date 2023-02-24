@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OetsvCalendarDataParser implements IKalenderReader {
-    //TODO add logging and error handeling
+    //TODO add logging and error handling
     private static final String urlString = "https://www.tanzsportverband.at/kalender/daten.html";
 
     @Override
@@ -28,11 +28,11 @@ public class OetsvCalendarDataParser implements IKalenderReader {
             throw new RuntimeException(e);
         }
 
-        return praseTournamentsFromDoc(htmlDoc);
+        return parseTournamentsFromDoc(htmlDoc);
     }
 
 
-    private Collection<ShortTournament> praseTournamentsFromDoc(Document doc) {
+    private Collection<ShortTournament> parseTournamentsFromDoc(Document doc) {
         Collection<ShortTournament> tournamentSet = new HashSet<>();
 
         Element table = doc.select("table").first();
