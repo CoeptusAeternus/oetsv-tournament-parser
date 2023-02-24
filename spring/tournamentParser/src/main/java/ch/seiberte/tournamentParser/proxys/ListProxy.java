@@ -1,33 +1,27 @@
 package ch.seiberte.tournamentParser.proxys;
 
 import ch.seiberte.tournamentParser.IKalenderReader;
+import ch.seiberte.tournamentParser.OetsvCalendarDataParser;
 import ch.seiberte.tournamentParser.data.KalenderParser;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 
 public class ListProxy implements IKalenderReader {
 
-    private Map<Long, ShortTournament> currentList;
-    private IKalenderReader baseService;
-
-    public ListProxy() {
-        this.currentList=new HashMap<>();
-        this.baseService=new KalenderParser();//TODO
-    }
+    private Collection<ShortTournament> currentList =new HashSet<>();
+    private IKalenderReader baseService = new OetsvCalendarDataParser();
 
     @Override
     public Collection<ShortTournament> getTournaments() {
-        return currentList.values();
+        if(currentList.isEmpty())
+            updateList();
+        return currentList;
     }
 
-    public Collection<Long> getCurrentIds(){
-        return currentList.keySet();
-    }
-    public void updateList(){
-
+    private void updateList(){
+        currentList = baseService.getTournaments();
     }
 
 }

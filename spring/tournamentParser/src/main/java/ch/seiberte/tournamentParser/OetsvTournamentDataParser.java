@@ -5,6 +5,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -15,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OetsvTournamentDataParser implements ITournamentReader {
-
+    private static Logger logger = LoggerFactory.getLogger(OetsvTournamentDataParser.class);
     private static final String urlPart1 = "https://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr=";
     private static final String urlPart2 = "&art=IN&conf_html=1";
 
@@ -30,9 +32,12 @@ public class OetsvTournamentDataParser implements ITournamentReader {
             throw new RuntimeException(e);
         }
 
+        if(htmlDoc.body().text().equals(""))
+            throw new EmptyTournamentException("Tournament not found");
+
         Element dataBody = htmlDoc.select("table").first().select("tr").get(3);
 
-        String rawAdressString = htmlDoc.select("td").get(6).text();
+        String rawAdressString = htmlDoc.select("td").get(8).text();
         String adress = rawAdressString.substring(0, rawAdressString.length() - 16);
 
         String bezeichnung = dataBody.select("td").get(4).text();
@@ -57,7 +62,7 @@ public class OetsvTournamentDataParser implements ITournamentReader {
 
     private LocalDateTime parseDateTimeFromString(String dateTime) {
 
-        String rawDateString = dateTime.substring(6, dateTime.length() - 4);
+        String rawDateString = dateTime.substring(5, dateTime.length() - 4);
 
         DateTimeFormatter oetsvDateTimePattern = DateTimeFormatter.ofPattern("d. M. yyyy, H:mm");
 

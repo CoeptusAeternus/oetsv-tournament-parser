@@ -20,7 +20,7 @@ public class TournamentProxy implements ITournamentReader {
     public TournamentProxy() {
         this.currentTournaments=new HashMap<>();
         this.tournamentsArchive=new HashMap<>();
-        this.baseService=new OetsvTournamentDataParser();//TODO
+        this.baseService=new OetsvTournamentDataParser();
     }
 
     @Override
@@ -30,28 +30,5 @@ public class TournamentProxy implements ITournamentReader {
         if(tournamentsArchive.containsKey(id))
             return tournamentsArchive.get(id);
         return baseService.readTournament(id);
-    }
-
-    public void updateCurrentTournaments(Collection<Long> currentIds){
-       if(currentTournaments.keySet().equals(currentIds))
-           return;
-
-       Set<Long> oldIds = currentTournaments.keySet();
-       for(Long id : currentIds){
-           if(!currentTournaments.containsKey(id)){
-               LongTournament newTournament = baseService.readTournament(id);
-               currentTournaments.put(newTournament.getId(), newTournament);
-           }
-        }
-    }
-
-    public void reset(){
-        currentTournaments=new HashMap<>();
-        tournamentsArchive=new HashMap<>();
-    }
-
-    public void resetAndUpdate(Collection<Long> currentIds){
-        reset();
-        updateCurrentTournaments(currentIds);
     }
 }

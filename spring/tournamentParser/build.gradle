@@ -1,12 +1,12 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.0.2'
+	id 'org.springframework.boot' version '2.7.9'
 	id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'ch.seiberte'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+version = '1.0'
+sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
@@ -23,8 +23,19 @@ dependencies {
 	implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.6'
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
 
+}
+
+jar {
+	manifest {
+		attributes(
+				'Main-Class': 'ch.seiberte.tournamentParser.TournamentParserApplication'
+		)
+	}
+	from {
+		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+	}
 }
 
 tasks.named('test') {
