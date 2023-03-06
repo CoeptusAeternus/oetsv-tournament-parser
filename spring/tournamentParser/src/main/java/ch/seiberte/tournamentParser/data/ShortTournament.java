@@ -1,25 +1,26 @@
 package ch.seiberte.tournamentParser.data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ShortTournament extends BaseTournament{
-    private LocalDate start;
+    private LocalDateTime start; //start not in DateTime due to changes after rollout
 
     public ShortTournament(Long id, String bezeichnung, LocalDate start) {
         super(id, bezeichnung);
-        this.start = start;
+        this.start = start.atTime(0,0);
     }
 
     public ShortTournament() {
         super();
-        this.start=LocalDate.MIN;
+        this.start=LocalDateTime.MIN;
     }
 
-    public LocalDate getStart() {
+    public LocalDateTime getStart() {
         return start;
     }
 
-    public void setStart(LocalDate start) {
+    public void setStart(LocalDateTime start) {
         this.start = start;
     }
 

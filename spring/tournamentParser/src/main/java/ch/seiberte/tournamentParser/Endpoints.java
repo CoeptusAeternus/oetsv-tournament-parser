@@ -4,7 +4,6 @@ import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
 import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
-import ch.seiberte.tournamentParser.exceptions.UnableToReadDataExcpetion;
 import ch.seiberte.tournamentParser.proxys.ListProxy;
 import ch.seiberte.tournamentParser.proxys.TournamentProxy;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -53,7 +53,7 @@ public class Endpoints {
     }
 
     @RequestMapping(value = "/oetsv_kalender/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Collection<ShortTournament> returnList() {
+    public List<ShortTournament> returnList() {
         logger.info("request at /oetsv_kalender/list");
         return kr.getTournaments();
     }
@@ -72,15 +72,6 @@ public class Endpoints {
     public Map<String, String> handleEmptyTournamentException(EmptyTournamentException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("status", HttpStatus.BAD_REQUEST.value() + "");
-        errorMap.put("message", ex.getMessage());
-        return errorMap;
-    }
-
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler({UnableToReadDataExcpetion.class})
-    public Map<String, String> handleUnableToReadTournamentException(EmptyTournamentException ex) {
-        Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value() + "");
         errorMap.put("message", ex.getMessage());
         return errorMap;
     }

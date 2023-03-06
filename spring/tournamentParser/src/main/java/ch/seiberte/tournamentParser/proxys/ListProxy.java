@@ -4,18 +4,19 @@ import ch.seiberte.tournamentParser.IKalenderReader;
 import ch.seiberte.tournamentParser.OetsvCalendarDataParser;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListProxy implements IKalenderReader {
 
-    private Collection<ShortTournament> currentList =new HashSet<>();
+    private List<ShortTournament> currentList =new ArrayList<>();
     private final IKalenderReader baseService = new OetsvCalendarDataParser();
 
     @Override
-    public Collection<ShortTournament> getTournaments() {
+    public List<ShortTournament> getTournaments() {
         if(currentList.isEmpty())
             updateList();
+        currentList.sort((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1);
         return currentList;
     }
 

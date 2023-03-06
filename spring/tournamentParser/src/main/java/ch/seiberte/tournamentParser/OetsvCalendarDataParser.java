@@ -9,8 +9,10 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +21,7 @@ public class OetsvCalendarDataParser implements IKalenderReader {
     private static final String urlString = "https://www.tanzsportverband.at/kalender/daten.html";
 
     @Override
-    public Collection<ShortTournament> getTournaments() {
+    public List<ShortTournament> getTournaments() {
 
         Document htmlDoc;
         try {
@@ -28,7 +30,7 @@ public class OetsvCalendarDataParser implements IKalenderReader {
             throw new RuntimeException(e);
         }
 
-        return parseTournamentsFromDoc(htmlDoc);
+        return new ArrayList<>(parseTournamentsFromDoc(htmlDoc));
     }
 
 
