@@ -14,8 +14,7 @@ public class ListProxy implements IKalenderReader {
 
     @Override
     public List<ShortTournament> getTournaments() {
-        if(currentList.isEmpty())
-            updateList();
+        updateList();
         currentList.sort((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1);
         return currentList;
     }

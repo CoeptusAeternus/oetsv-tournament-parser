@@ -60,7 +60,7 @@ public class Endpoints {
 
     @RequestMapping(value = "/oetsv_kalender/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public LongTournament returnTournament(@Validated @PathVariable String tournamentId) {
-        logger.debug("providing Tournament: {}", tournamentId);
+        logger.info("request at TournamentID: {}", tournamentId);
         if(tournamentId.equals("418"))
             throw new IAmATeapotException();
 
