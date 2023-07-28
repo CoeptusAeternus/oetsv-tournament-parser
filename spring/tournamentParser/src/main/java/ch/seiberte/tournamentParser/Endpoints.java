@@ -29,7 +29,7 @@ import java.util.Map;
 public class Endpoints {
 
     ITournamentReader tr;
-    IKalenderReader kr;
+    IKalenderReader kr; //TODO Change to ProxyMailer
 
     public Endpoints() {
         this.tr = new TournamentProxy();
@@ -109,6 +109,7 @@ public class Endpoints {
     @Scheduled(fixedRate = 3600000)
     public void updateCollectionAndMap() {
         logger.info("updating all tournaments");
+        kr.getTournaments();
         Collection<ShortTournament> cst = kr.getTournaments();
         for (ShortTournament st : cst)
             tr.readTournament(st.getId());
