@@ -1,36 +1,29 @@
 package ch.seiberte.tournamentParser;
 
-import ch.seiberte.tournamentParser.data.ShortTournament;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
-
 import java.util.Properties;
+public class MailerService implements IMailerService{
 
-public class ShortMailerService implements ITournamentMailer{
-
-    private String sender;
     private Properties props;
+    private String sender;
 
-    public ShortMailerService() {
+    public MailerService() {
         this.sender = "noreply@seiberte.ch";;
         this.props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", "mail.seiberte.ch");
         props.put("mail.smtp.port", "587");
-
     }
 
     @Override
-    public void sendMail(ShortTournament st, String email) {
-
-        String subject = "Neues Turnier im ÖTSV-Kalender gefunden: " + st.getBezeichnung();
-        String text = "Informationen:\nBezeichnung: "+st.getBezeichnung()+"\n Auschreibgung unter:\nhttps://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr="+st.getId()+"&art=IN&conf_html=1";
+    public void sendMail(String to, String text, String subject) {
         Authenticator authenticator = new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(sender, "***REMOVED***");
+                return new PasswordAuthentication(sender, "*********");
             }
         };
         Session session = Session.getInstance(props, authenticator);
@@ -39,7 +32,7 @@ public class ShortMailerService implements ITournamentMailer{
             Message m = new MimeMessage(session);
 
             m.setFrom(new InternetAddress(sender));
-            m.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+            m.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             m.setSubject(subject);
             m.setText(text);
 
@@ -49,6 +42,5 @@ public class ShortMailerService implements ITournamentMailer{
         }catch (MessagingException e){
             throw new RuntimeException(e);
         }
-
     }
 }

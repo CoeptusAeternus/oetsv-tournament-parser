@@ -4,7 +4,9 @@ import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
 import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
+import ch.seiberte.tournamentParser.proxys.IKalenderProxy;
 import ch.seiberte.tournamentParser.proxys.ListProxy;
+import ch.seiberte.tournamentParser.proxys.TournamentListProxyWithMailer;
 import ch.seiberte.tournamentParser.proxys.TournamentProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -28,12 +32,14 @@ import java.util.Map;
 @RestController
 public class Endpoints {
 
+    ITournamentMailer nennschlussReminder;
     ITournamentReader tr;
-    IKalenderReader kr; //TODO Change to ProxyMailer
+    IKalenderProxy kr;
 
     public Endpoints() {
         this.tr = new TournamentProxy();
-        this.kr = new ListProxy();
+        this.kr = new TournamentListProxyWithMailer();
+        this.nennschlussReminder = new NennschlussReminderService();
     }
 
     private static Logger logger = LoggerFactory.getLogger(Endpoints.class);
@@ -109,10 +115,21 @@ public class Endpoints {
     @Scheduled(fixedRate = 3600000)
     public void updateCollectionAndMap() {
         logger.info("updating all tournaments");
-        kr.getTournaments();
+        kr.updateTournaments();
         Collection<ShortTournament> cst = kr.getTournaments();
         for (ShortTournament st : cst)
             tr.readTournament(st.getId());
+    }
 
+    @Scheduled(cron = "0 6 * * * ?")
+    public void checkForNennschluss(){
+        logger.info("checking for Nennschluss Reminders");
+        LocalDateTime now = LocalDateTime.now();
+        now = now.withSecond(0).withMinute(0).withHour(0).truncatedTo(ChronoUnit.SECONDS);
+        for(ShortTournament st : kr.getTournaments())
+            if(st.getBezeichnung().equals(now)) {
+                logger.info("Sending Nennschluss Reminder Mail for: "+ st.getBezeichnung());
+                nennschlussReminder.sendMail(st, "jaksei.lol@gmail.com");
+            }
     }
 }
