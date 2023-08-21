@@ -28,6 +28,13 @@ dependencies {
 	// https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api
 	implementation group: 'jakarta.mail', name: 'jakarta.mail-api', version: '2.1.2'
 
+	// https://mvnrepository.com/artifact/jakarta.activation/jakarta.activation-api
+	implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.2'
+
+	// https://mvnrepository.com/artifact/org.eclipse.angus/jakarta.mail
+	implementation group: 'org.eclipse.angus', name: 'jakarta.mail', version: '2.0.0'
+
+
 }
 
 jar {

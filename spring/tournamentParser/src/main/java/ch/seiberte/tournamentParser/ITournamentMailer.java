@@ -4,5 +4,5 @@ import ch.seiberte.tournamentParser.data.ShortTournament;
 
 public interface ITournamentMailer {
 
-    public void sendMail(ShortTournament st, String email);
+    void sendMail(ShortTournament st, String email);
 }
