@@ -37,6 +37,7 @@ public class TournamentListProxyWithMailer implements IKalenderProxy {
                 if(!cachedTournaments.contains(st)) {
                     logger.info("Sending Mail with new Tournament: "+st.getBezeichnung());
                     mailer.sendMail(st, "jaksei.lol@gmail.com");
+                    mailer.sendMail(st, "sportwart@schwarzgold.at");
                 }
             }
 
