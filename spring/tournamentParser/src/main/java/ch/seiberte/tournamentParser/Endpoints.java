@@ -4,10 +4,7 @@ import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
 import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
-import ch.seiberte.tournamentParser.proxys.IKalenderProxy;
-import ch.seiberte.tournamentParser.proxys.ListProxy;
-import ch.seiberte.tournamentParser.proxys.TournamentListProxyWithMailer;
-import ch.seiberte.tournamentParser.proxys.TournamentProxy;
+import ch.seiberte.tournamentParser.proxys.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +34,7 @@ public class Endpoints {
     IKalenderProxy kr;
 
     public Endpoints() {
-        this.tr = new TournamentProxy();
+        this.tr = new RenamingTournamentProxy();
         this.kr = new TournamentListProxyWithMailer();
         this.nennschlussReminder = new NennschlussReminderService();
     }
@@ -121,7 +118,7 @@ public class Endpoints {
             tr.readTournament(st.getId());
     }
 
-    @Scheduled(cron = "0 6 * * * ?")
+    @Scheduled(cron = "0 6 * * * ?") //TODO Check if regex is corret - Started Check at 0:06 not 6:00
     public void checkForNennschluss(){
         logger.info("checking for Nennschluss Reminders");
         LocalDateTime now = LocalDateTime.now();

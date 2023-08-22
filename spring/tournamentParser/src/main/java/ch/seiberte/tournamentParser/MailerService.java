@@ -11,7 +11,7 @@ public class MailerService implements IMailerService{
     private String sender;
 
     public MailerService() {
-        this.sender = "noreply@seiberte.ch";;
+        this.sender = "noreply@seiberte.ch";
         this.props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
