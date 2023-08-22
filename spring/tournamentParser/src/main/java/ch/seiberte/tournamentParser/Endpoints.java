@@ -126,10 +126,14 @@ public class Endpoints {
         logger.info("checking for Nennschluss Reminders");
         LocalDateTime now = LocalDateTime.now();
         now = now.withSecond(0).withMinute(0).withHour(0).truncatedTo(ChronoUnit.SECONDS);
-        for(ShortTournament st : kr.getTournaments())
-            if(st.getBezeichnung().equals(now)) {
-                logger.info("Sending Nennschluss Reminder Mail for: "+ st.getBezeichnung());
+        for(ShortTournament st : kr.getTournaments()) {
+            LocalDateTime nennschlussReminderDate = st.getStart();
+            nennschlussReminderDate = nennschlussReminderDate.minusDays(13);
+            if (nennschlussReminderDate.equals(now)) {
+                logger.info("Sending Nennschluss Reminder Mail for: " + st.getBezeichnung());
                 nennschlussReminder.sendMail(st, "jaksei.lol@gmail.com");
+                nennschlussReminder.sendMail(st, "sportwart@schwarzgold.at");
             }
+        }
     }
 }

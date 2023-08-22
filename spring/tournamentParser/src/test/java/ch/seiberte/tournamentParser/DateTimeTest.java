@@ -20,6 +20,7 @@ public class DateTimeTest {
         System.out.println(now);
         LocalDateTime dt2 = LocalDateTime.parse("2023-09-03T00:00:00");
         System.out.println(dt2.minusDays(13));
+        System.out.println(dt2);
         System.out.println(dt2.equals(now));
         System.out.println(dt2.minusDays(13).equals(now));
     }

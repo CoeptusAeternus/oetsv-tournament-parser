@@ -23,7 +23,7 @@ public class MailerService implements IMailerService{
     public void sendMail(String to, String text, String subject) {
         Authenticator authenticator = new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(sender, "*********");
+                return new PasswordAuthentication(sender, "OHhCDlnf!");
             }
         };
         Session session = Session.getInstance(props, authenticator);
