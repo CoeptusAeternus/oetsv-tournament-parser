@@ -9,20 +9,23 @@ import java.util.Map;
 
 public class TournamentProxy implements ITournamentReader {
 
-    private Map<Long, LongTournament> tournamentCache;
-    private final ITournamentReader baseService;
+    protected Map<Long, LongTournament> tournamentCache;
+    protected final ITournamentReader baseService;
 
     public TournamentProxy() {
         this.tournamentCache =new HashMap<>();
         this.baseService=new OetsvTournamentDataParser();
     }
 
-    @Override
-    public LongTournament readTournament(Long id) {
-        if(tournamentCache.containsKey(id))
-            return tournamentCache.get(id);
+    protected void addTournamentToCache(Long id){
         LongTournament newTournament = baseService.readTournament(id);
         tournamentCache.put(newTournament.getId(), newTournament);
-        return newTournament;
+    }
+
+    @Override
+    public LongTournament readTournament(Long id) {
+        if(!tournamentCache.containsKey(id))
+            addTournamentToCache(id);
+        return tournamentCache.get(id);
     }
 }
