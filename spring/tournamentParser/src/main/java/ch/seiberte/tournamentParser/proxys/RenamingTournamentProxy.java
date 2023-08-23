@@ -28,7 +28,7 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
 
         if(teile.get(0).matches("[Ww]ien.*"))
             teile.set(0,"Wien");
-        if(teile.get(0).matches("[Bb]urg.*"))
+        if(teile.get(0).matches("[Bb]urge.*"))
             teile.set(0,"Burgenland");
         if(teile.get(0).matches("[Kk]ärnt.*"))
             teile.set(0,"Kärnten");
@@ -55,23 +55,47 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
         return String.join(" ",teile);
     }
 
+    private String reformatSeniorenLM(String bezeichnung){
+
+        if(bezeichnung.matches(".*[Ww]ien.*"))
+            return "LM Wien Senioren";
+        if(bezeichnung.matches(".*[Bb]urge.*"))
+            return "LM Burgenland Senioren";
+        if(bezeichnung.matches(".*[Kk]ärnt.*"))
+            return "LM Kärnten Senioren";
+        if(bezeichnung.matches(".*[N]ieder.*"))
+            return "LM Niederösterreich Senioren";
+        if(bezeichnung.matches(".*[Oo]ber.*"))
+            return "LM Oberösterreich Senioren";
+        if(bezeichnung.matches(".*[Ss]alz.*"))
+            return "LM Salzburg Senioren";
+        if(bezeichnung.matches(".*[Ss]tei.*"))
+            return "LM Steiermark Senioren";
+        if(bezeichnung.matches(".*[Tt]irol.*"))
+            return "LM Tirol Senioren";
+        if(bezeichnung.matches(".*[Vv]ora.*"))
+            return "LM Vorarlberg Senioren";
+
+
+        return bezeichnung;
+    }
+
     private String reformatOeM(String bezeichnung){
         List<String> teile = new ArrayList<>(Arrays.asList(bezeichnung.split(" ",3)));
-        String neueBezeichnung = "ÖM" + teile.get(teile.size()-1);
-        return neueBezeichnung;
+        return "ÖM" + teile.get(teile.size()-1);
     }
 
     private String reformatStaats(String bezeichnung){
         if(bezeichnung.matches(".*Staatsmeisterschaft(en)? (Latein|Standard|Kombi.*)")){
-            String neuebezeichnung = "Staats ";
+            String neueBezeichnung = "Staats ";
             if(bezeichnung.matches(".*Latein.*"))
-                neuebezeichnung=neuebezeichnung+"Latein";
+                neueBezeichnung=neueBezeichnung+"Latein";
             if(bezeichnung.matches(".*Standard.*"))
-                neuebezeichnung=neuebezeichnung+"Standard";
+                neueBezeichnung=neueBezeichnung+"Standard";
             if(bezeichnung.matches(".*Kombi.*"))
-                neuebezeichnung=neuebezeichnung+"Kombi";
+                neueBezeichnung=neueBezeichnung+"Kombi";
 
-            return neuebezeichnung;
+            return neueBezeichnung;
         }
 
         return bezeichnung;
@@ -81,7 +105,7 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
     protected void addTournamentToCache(Long id){
         LongTournament newTournament = baseService.readTournament(id);
 
-        if(newTournament.getBezeichnung().matches(".*Landesmeisterschaft.*")){
+        if(newTournament.getBezeichnung().matches("(.*Landesmeisterschaft.*|.*Meisterschaft Senioren.*)")){
             logger.info("Changing Tournament Name for LT with id:" + id +" (LM)");
             String neueBezeichnung = reformatLM(newTournament.getBezeichnung());
             newTournament.setBezeichnung(neueBezeichnung);
@@ -96,6 +120,12 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
         if(newTournament.getBezeichnung().matches(".*Staatsmeisterschaft.*")){
             logger.info("Changing Tournament Name for LT with id:" + id +" (Staats)");
             String neueBezeichnung = reformatStaats(newTournament.getBezeichnung());
+            newTournament.setBezeichnung(neueBezeichnung);
+        }
+
+        if(newTournament.getBezeichnung().matches(".*Meisterschaft Senioren.*")){
+            logger.info("Changing Tournament Name for LT with id:" + id +" (LM Senioren)");
+            String neueBezeichnung = reformatSeniorenLM(newTournament.getBezeichnung());
             newTournament.setBezeichnung(neueBezeichnung);
         }
 

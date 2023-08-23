@@ -1,12 +1,6 @@
 package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.ShortTournament;
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-
-
-import java.util.Properties;
 
 public class NewTournamentService implements ITournamentMailer{
 

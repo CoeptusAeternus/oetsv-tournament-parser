@@ -2,7 +2,6 @@ package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.ShortTournament;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface IKalenderReader {

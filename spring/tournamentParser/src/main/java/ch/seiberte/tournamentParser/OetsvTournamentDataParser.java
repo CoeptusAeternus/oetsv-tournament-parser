@@ -2,10 +2,13 @@ package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
+import ch.seiberte.tournamentParser.exceptions.UnableToReadDataException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
@@ -17,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OetsvTournamentDataParser implements ITournamentReader {
+
+    private Logger logger = LoggerFactory.getLogger(OetsvTournamentDataParser.class);
     private static final String urlPart1 = "https://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr=";
     private static final String urlPart2 = "&art=IN&conf_html=1";
 
@@ -28,16 +33,18 @@ public class OetsvTournamentDataParser implements ITournamentReader {
         try {
             htmlDoc = Jsoup.connect(urlPart1 + id.toString() + urlPart2).get();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error("Unable to access URL: "+urlPart1 + id + urlPart2);
+            throw new UnableToReadDataException();
         }
 
-        if(htmlDoc.body().text().equals(""))
+        if(htmlDoc.body().text().equals("")) {
+            logger.warn("Could not get Data from Tournament with ID: "+id);
             throw new EmptyTournamentException("Tournament not found");
-
+        }
         Element dataBody = htmlDoc.select("table").first().select("tr").get(3);
 
         String rawAdressString = htmlDoc.select("td").get(8).text();
-        String adress = rawAdressString.substring(0, rawAdressString.length() - 16);
+        String address = rawAdressString.substring(0, rawAdressString.length() - 16);
 
         String bezeichnung = dataBody.select("td").get(4).text();
 
@@ -56,7 +63,7 @@ public class OetsvTournamentDataParser implements ITournamentReader {
         }
 
 
-        return new LongTournament(adress, bezeichnung, start, id, nenngeld, klassen);
+        return new LongTournament(address, bezeichnung, start, id, nenngeld, klassen);
     }
 
     private LocalDateTime parseDateTimeFromString(String dateTime) {
@@ -69,7 +76,7 @@ public class OetsvTournamentDataParser implements ITournamentReader {
     }
 
     private String parseNenngeld(String data) {
-        Pattern nenngeldSearchPattern = Pattern.compile("Nenngeld:(\\s|\\w|€)*\\d+(,(\\d{2}|-)|)");
+        Pattern nenngeldSearchPattern = Pattern.compile("Nenngeld:?(\\s|\\w|€)*\\d+(,(\\d{2}|-)|)");
         Matcher nenngeldMatcher = nenngeldSearchPattern.matcher(data);
 
         if (nenngeldMatcher.find()) {
@@ -80,8 +87,10 @@ public class OetsvTournamentDataParser implements ITournamentReader {
 
             if (nenngeldAmountMatcher.find())
                 return nenngeldAmountMatcher.group(0);
-            else
+            else {
+                logger.info("Could not process Nenngeld in String: "+data);
                 return "Nenngeld konnte nicht verarbeitet werden. Bitte in Ausschreibung nachlesen";
+            }
 
         } else
             return "0";
