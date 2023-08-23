@@ -1,4 +1,4 @@
-package ch.seiberte.tournamentParser;
+package ch.seiberte.tournamentParser.mailers;
 
 public interface IMailerService {
 

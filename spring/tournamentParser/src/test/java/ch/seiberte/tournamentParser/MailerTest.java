@@ -1,6 +1,9 @@
 package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.ShortTournament;
+import ch.seiberte.tournamentParser.mailers.ITournamentMailer;
+import ch.seiberte.tournamentParser.mailers.NennschlussReminderService;
+import ch.seiberte.tournamentParser.mailers.NewTournamentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
