@@ -16,9 +16,9 @@ public class NennschlussReminderService implements ITournamentMailer{
     public void sendMail(ShortTournament st, String email) {
 
         LocalDateTime ldt = st.getStart();
-        String tournametDate = ldt.getDayOfMonth() +"."+ldt.getMonth().toString()+"."+ldt.getYear();
+        String tournamentDate = ldt.getDayOfMonth() +"."+ldt.getMonth().toString()+"."+ldt.getYear();
         String subject  = "Nennschluss für Turnier "+ st.getBezeichnung()+"vorbei";
-        String text = "Der Nennschluss für das Turnier " + st.getBezeichnung()+" am "+ tournametDate +" ist vorbei.\n https://nennungen.schwarzgold.at/";
+        String text = "Der Nennschluss für das Turnier " + st.getBezeichnung()+" am "+ tournamentDate +" ist vorbei.\n https://nennungen.schwarzgold.at/";
 
         mailerService.sendMail(email,text,subject);
     }

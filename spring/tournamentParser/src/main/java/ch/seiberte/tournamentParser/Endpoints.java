@@ -118,7 +118,7 @@ public class Endpoints {
             tr.readTournament(st.getId());
     }
 
-    @Scheduled(cron = "0 6 * * * ?") //TODO Check if regex is corret - Started Check at 0:06 not 6:00
+    @Scheduled(cron = "0 6 * * * ?") //TODO Check if regex is correct - Started Check at 0:06 not 6:00
     public void checkForNennschluss(){
         logger.info("checking for Nennschluss Reminders");
         LocalDateTime now = LocalDateTime.now();
