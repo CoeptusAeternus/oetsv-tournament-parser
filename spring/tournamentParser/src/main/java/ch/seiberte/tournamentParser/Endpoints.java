@@ -4,6 +4,8 @@ import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
 import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
+import ch.seiberte.tournamentParser.mailers.ITournamentMailer;
+import ch.seiberte.tournamentParser.mailers.NennschlussReminderService;
 import ch.seiberte.tournamentParser.proxys.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +120,7 @@ public class Endpoints {
             tr.readTournament(st.getId());
     }
 
-    @Scheduled(cron = "0 6 * * * ?") //TODO Check if regex is correct - Started Check at 0:06 not 6:00
+    @Scheduled(cron = "0 0 6 1/1 * ?")
     public void checkForNennschluss(){
         logger.info("checking for Nennschluss Reminders");
         LocalDateTime now = LocalDateTime.now();

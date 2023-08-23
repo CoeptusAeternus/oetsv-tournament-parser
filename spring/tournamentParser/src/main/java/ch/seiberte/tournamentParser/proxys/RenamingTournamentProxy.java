@@ -28,13 +28,13 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
 
         if(teile.get(0).matches("[Ww]ien.*"))
             teile.set(0,"Wien");
-        if(teile.get(0).matches("[Bb]urge.*"))
+        if(teile.get(0).matches("[Bb]urgen.*"))
             teile.set(0,"Burgenland");
         if(teile.get(0).matches("[Kk]ärnt.*"))
             teile.set(0,"Kärnten");
-        if(teile.get(0).matches("[N]ieder.*"))
+        if(teile.get(0).matches("([Nn]ieder.*|N[Öö])"))
             teile.set(0,"Niederösterreich");
-        if(teile.get(0).matches("[Oo]ber.*"))
+        if(teile.get(0).matches("([Oo]ber.*|O[Öö])"))
             teile.set(0,"Oberösterreich");
         if(teile.get(0).matches("[Ss]alz.*"))
             teile.set(0,"Salzburg");
@@ -59,13 +59,13 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
 
         if(bezeichnung.matches(".*[Ww]ien.*"))
             return "LM Wien Senioren";
-        if(bezeichnung.matches(".*[Bb]urge.*"))
+        if(bezeichnung.matches(".*[Bb]urgen.*"))
             return "LM Burgenland Senioren";
         if(bezeichnung.matches(".*[Kk]ärnt.*"))
             return "LM Kärnten Senioren";
-        if(bezeichnung.matches(".*[N]ieder.*"))
+        if(bezeichnung.matches("([Nn]ieder.*|.*N[Öö].*)"))
             return "LM Niederösterreich Senioren";
-        if(bezeichnung.matches(".*[Oo]ber.*"))
+        if(bezeichnung.matches("([Oo]ber.*|.*O[Öö].*)"))
             return "LM Oberösterreich Senioren";
         if(bezeichnung.matches(".*[Ss]alz.*"))
             return "LM Salzburg Senioren";
@@ -105,7 +105,7 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
     protected void addTournamentToCache(Long id){
         LongTournament newTournament = baseService.readTournament(id);
 
-        if(newTournament.getBezeichnung().matches("(.*Landesmeisterschaft.*|.*Meisterschaft Senioren.*)")){
+        if(newTournament.getBezeichnung().matches(".*Landesmeisterschaft.*")){
             logger.info("Changing Tournament Name for LT with id:" + id +" (LM)");
             String neueBezeichnung = reformatLM(newTournament.getBezeichnung());
             newTournament.setBezeichnung(neueBezeichnung);
@@ -123,7 +123,7 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
             newTournament.setBezeichnung(neueBezeichnung);
         }
 
-        if(newTournament.getBezeichnung().matches(".*Meisterschaft Senioren.*")){
+        if(newTournament.getBezeichnung().matches(".*Meisterschaft.*Senioren.*")){
             logger.info("Changing Tournament Name for LT with id:" + id +" (LM Senioren)");
             String neueBezeichnung = reformatSeniorenLM(newTournament.getBezeichnung());
             newTournament.setBezeichnung(neueBezeichnung);

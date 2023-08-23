@@ -1,8 +1,8 @@
 package ch.seiberte.tournamentParser.proxys;
 
 import ch.seiberte.tournamentParser.IKalenderReader;
-import ch.seiberte.tournamentParser.ITournamentMailer;
-import ch.seiberte.tournamentParser.NewTournamentService;
+import ch.seiberte.tournamentParser.mailers.ITournamentMailer;
+import ch.seiberte.tournamentParser.mailers.NewTournamentService;
 import ch.seiberte.tournamentParser.OetsvCalendarDataParser;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 import org.slf4j.Logger;
