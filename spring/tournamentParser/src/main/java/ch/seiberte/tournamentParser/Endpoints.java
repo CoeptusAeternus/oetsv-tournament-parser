@@ -31,9 +31,9 @@ import java.util.Map;
 @RestController
 public class Endpoints {
 
-    ITournamentMailer nennschlussReminder;
-    ITournamentReader tr;
-    IKalenderProxy kr;
+    private ITournamentMailer nennschlussReminder;
+    private ITournamentReader tr;
+    private IKalenderProxy kr;
 
     public Endpoints() {
         this.tr = new RenamingTournamentProxy();
@@ -41,7 +41,7 @@ public class Endpoints {
         this.nennschlussReminder = new NennschlussReminderService();
     }
 
-    private static Logger logger = LoggerFactory.getLogger(Endpoints.class);
+    private static final Logger logger = LoggerFactory.getLogger(Endpoints.class);
 
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody

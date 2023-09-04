@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 public class OetsvTournamentDataParser implements ITournamentReader {
 
-    private Logger logger = LoggerFactory.getLogger(OetsvTournamentDataParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(OetsvTournamentDataParser.class);
     private static final String urlPart1 = "https://www.tanzsportverband.at/portal/ausschreibung/ausschreibung_drucken.php?TKNr=";
     private static final String urlPart2 = "&art=IN&conf_html=1";
 

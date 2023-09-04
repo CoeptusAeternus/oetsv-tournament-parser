@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RenamingTournamentProxy extends TournamentProxy implements ITournamentReader {
 
-    private Logger logger = LoggerFactory.getLogger(RenamingTournamentProxy.class);
+    private static final Logger logger = LoggerFactory.getLogger(RenamingTournamentProxy.class);
 
     private boolean isLateinStandardOrKombi(String str){
         return str.matches("Latein.*")||str.matches("Standard.*")||str.matches("Kombi.*");

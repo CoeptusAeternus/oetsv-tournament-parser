@@ -1,12 +1,18 @@
 package ch.seiberte.tournamentParser.mailers;
 
 import ch.seiberte.tournamentParser.data.ShortTournament;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class NennschlussReminderService implements ITournamentMailer{
 
-    private IMailerService mailerService;
+    private static final Logger logger = LoggerFactory.getLogger(NennschlussReminderService.class);
+
+    private final IMailerService mailerService;
 
     public NennschlussReminderService() {
         this.mailerService = new MailerService();
@@ -15,11 +21,15 @@ public class NennschlussReminderService implements ITournamentMailer{
     @Override
     public void sendMail(ShortTournament st, String email) {
 
-        LocalDateTime ldt = st.getStart();
-        String tournamentDate = ldt.getDayOfMonth() +"."+ldt.getMonth().toString()+"."+ldt.getYear();
-        String subject  = "Nennschluss für Turnier "+ st.getBezeichnung()+"vorbei";
-        String text = "Der Nennschluss für das Turnier " + st.getBezeichnung()+" am "+ tournamentDate +" ist vorbei.\n https://nennungen.schwarzgold.at/";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.MMMM.yyyy",new Locale("de"));
 
-        mailerService.sendMail(email,text,subject);
+        LocalDateTime ldt = st.getStart();
+        String subject  = "Nennschluss für Turnier "+ st.getBezeichnung()+" vorbei";
+        String text = "Der Nennschluss für das Turnier " + st.getBezeichnung()+" am "+ ldt.format(formatter) +" ist vorbei.\n https://nennungen.schwarzgold.at/";
+
+        logger.debug("Sending mail with Subject: "+ subject+"\nText: "+text+"\nto: "+email);
+
+        String senderName = "Nennschluss Erinnerung <noreply@seiberte.ch>";
+        mailerService.sendMail(senderName, email,text,subject);
     }
 }

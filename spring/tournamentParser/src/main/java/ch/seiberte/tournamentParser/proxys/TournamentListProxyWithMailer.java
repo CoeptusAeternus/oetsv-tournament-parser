@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TournamentListProxyWithMailer implements IKalenderProxy {
-    private static Logger logger = LoggerFactory.getLogger(TournamentListProxyWithMailer.class);
+    private static final Logger logger = LoggerFactory.getLogger(TournamentListProxyWithMailer.class);
 
     private List<ShortTournament> cachedTournaments;
-    private IKalenderReader baseService;
-    private ITournamentMailer mailer;
+    private final IKalenderReader baseService;
+    private final ITournamentMailer mailer;
 
     public TournamentListProxyWithMailer() {
         this.cachedTournaments = new ArrayList<>();

@@ -28,7 +28,8 @@ public class MailerTest {
         IKalenderReader kr = new OetsvCalendarDataParser();
         ShortTournament st = kr.getTournaments().get(0);
         ITournamentMailer mailer = new NewTournamentService();
-        mailer.sendMail(st, "sportwart@schwarzgold.at");
+        //System.out.println(st);
+        mailer.sendMail(st, "jaksei.lol@gmail.com");
     }
 
     @Test
@@ -36,9 +37,10 @@ public class MailerTest {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         String jsonString = "[{\"id\":1557,\"bezeichnung\":\"Landesmeisterschaft Standard Tirol\",\"start\":\"2023-09-03T00:00:00\"},{\"id\":1555,\"bezeichnung\":\"Landesmeisterschaft Latein Tirol\",\"start\":\"2023-09-02T00:00:00\"},{\"id\":1556,\"bezeichnung\":\"Tiroler Meisterschaft Schüler, Junioren Jugend\",\"start\":\"2023-09-04T00:00:00\"}]";
-        List<ShortTournament> stList = null;
+        List<ShortTournament> stList;
         try {
-            stList = mapper.readValue(jsonString, new TypeReference<List<ShortTournament>>(){});
+            stList = mapper.readValue(jsonString, new TypeReference<>() {
+            });
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
