@@ -23,6 +23,9 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
 
         teile.remove("Landesmeisterschaft");
 
+        if(teile.size()<2)
+            return bezeichnung;
+
         if(isLateinStandardOrKombi(teile.get(0)))
             Collections.swap(teile,0,1);
 

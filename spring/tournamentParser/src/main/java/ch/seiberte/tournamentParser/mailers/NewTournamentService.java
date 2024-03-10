@@ -26,7 +26,7 @@ public class NewTournamentService implements ITournamentMailer{
 
         logger.debug("Sending mail with Subject: "+ subject+"\nText: "+text+"\nto: "+email);
 
-        String senderName = "Neues Turnier Mitteilung <noreply@seiberte.ch>";
+        String senderName = "Neues Turnier Mitteilung";
         mailerService.sendMail(senderName, email,text,subject);
 
     }

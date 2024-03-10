@@ -29,7 +29,7 @@ public class NennschlussReminderService implements ITournamentMailer{
 
         logger.debug("Sending mail with Subject: "+ subject+"\nText: "+text+"\nto: "+email);
 
-        String senderName = "Nennschluss Erinnerung <noreply@seiberte.ch>";
+        String senderName = "Nennschluss Erinnerung";
         mailerService.sendMail(senderName, email,text,subject);
     }
 }
