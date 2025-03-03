@@ -7,6 +7,13 @@ import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
 import ch.seiberte.tournamentParser.mailers.ITournamentMailer;
 import ch.seiberte.tournamentParser.mailers.NennschlussReminderService;
 import ch.seiberte.tournamentParser.proxys.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -42,14 +49,33 @@ public class Endpoints {
     private static final Logger logger = LoggerFactory.getLogger(Endpoints.class);
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "List all available Tournaments", description = "Returns a list of all available Tournaments")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "List of Tournaments found",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ShortTournament.class)))
+            )
+    })
     public List<ShortTournament> returnList() {
         logger.info("request at /list");
         return kr.getTournaments();
     }
 
     @RequestMapping(value = "/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public LongTournament returnTournament(@Validated @PathVariable String tournamentId) {
-        logger.info("request at TournamentID: {}", tournamentId);
+    @Operation(summary = "Get a specific Tournament", description = "Returns a specific Tournament by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "Tournament found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LongTournament.class))),
+            @ApiResponse(responseCode = "400", description = "Tournament not found")
+    })
+    public LongTournament returnTournament(
+            @Parameter(description = "ID of the Tournament to be found", required = true)
+            @Validated @PathVariable String tournamentId) {
+        logger.info("request at TournamentID: {}", tournamentId
+        );
         if(tournamentId.equals("418"))
             throw new IAmATeapotException();
 
