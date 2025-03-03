@@ -17,8 +17,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -43,27 +41,13 @@ public class Endpoints {
 
     private static final Logger logger = LoggerFactory.getLogger(Endpoints.class);
 
-    @RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    @ResponseBody
-    public String mainPage() {
-        logger.info("request at /");
-        return "<p>api at <a href=/oetsv_kalender title=api>/oetsv_kalender</a></p>";
-    }
-
-    @RequestMapping(value = "/oetsv_kalender", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    @ResponseBody
-    public String linkTreePage() {
-        logger.info("request at /oetsv_kalender");
-        return "Overview List for all current Tournaments under <a href=/oetsv_kalender/list>/list</a><br>Details for single tournament with /&lt;id&gt;";
-    }
-
-    @RequestMapping(value = "/oetsv_kalender/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ShortTournament> returnList() {
-        logger.info("request at /oetsv_kalender/list");
+        logger.info("request at /list");
         return kr.getTournaments();
     }
 
-    @RequestMapping(value = "/oetsv_kalender/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public LongTournament returnTournament(@Validated @PathVariable String tournamentId) {
         logger.info("request at TournamentID: {}", tournamentId);
         if(tournamentId.equals("418"))
@@ -90,27 +74,6 @@ public class Endpoints {
         return errorMap;
     }
 
-    @RequestMapping(value = "/error", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, String> handleError(HttpServletRequest request) {
-        Map<String, String> errorMap = new HashMap<>();
-
-        Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        if (status != null)
-            errorMap.put("status", status.toString());
-
-        Object uri = request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
-        if (uri != null)
-            errorMap.put("uri", uri.toString());
-
-        Object message = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
-        if (message != null)
-            errorMap.put("message", message.toString());
-
-        logger.warn("Error: {}", errorMap);
-
-        return errorMap;
-    }
-
     @Scheduled(fixedRate = 3600000)
     public void updateCollectionAndMap() {
         logger.info("updating all tournaments");
@@ -132,6 +95,7 @@ public class Endpoints {
                 logger.info("Sending Nennschluss Reminder Mail for: " + st.getBezeichnung());
                 nennschlussReminder.sendMail(st, "jaksei.lol@gmail.com");
                 nennschlussReminder.sendMail(st, "sportwart@schwarzgold.at");
+                nennschlussReminder.sendMail(st, "fiona.gartlgruber@gmail.com");
             }
         }
     }
