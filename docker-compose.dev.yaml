@@ -9,33 +9,15 @@ services:
     volumes:
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
       - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
-    expose:
-      - "5672"
-    restart: unless-stopped
-
-  torunament-parser:
-    build:
-      context: tournamentParser
-      dockerfile: Dockerfile
-      target: build
-    container_name: "tournament-parser"
-    hostname: "tournament-parser"
-    environment:
-      RABBITMQ_HOST: "rabbitmq"
-      RABBITMQ_PORT: "5672"
-      RABBITMQ_USER: "user"
-      RABBITMQ_PASS: "password"
     ports:
-      - "80:8080"
-    depends_on:
-      - rabbitmq
+      - "5672:5672"
     restart: unless-stopped
 
     email-worker:
       build:
         context: mailer
         dockerfile: Dockerfile
-        target: build
+        target: develop
       container_name: "email-worker"
       hostname: "email-worker"
       environment:
