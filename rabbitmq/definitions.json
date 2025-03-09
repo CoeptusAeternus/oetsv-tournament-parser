@@ -1,0 +1,47 @@
+{
+    "users": [
+      {
+        "name": "user",
+        "password_hash": "",
+        "password": "password",
+        "tags": "administrator"
+      }
+    ],
+    "vhosts": [
+      { "name": "/" }
+    ],
+    "permissions": [
+      {
+        "user": "user",
+        "vhost": "/",
+        "configure": ".*",
+        "write": ".*",
+        "read": ".*"
+      }
+    ],
+    "queues": [
+      {
+        "name": "email_queue",
+        "vhost": "/",
+        "durable": true
+      }
+    ],
+    "exchanges": [
+      {
+        "name": "email_exchange",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true
+      }
+    ],
+    "bindings": [
+      {
+        "source": "email_exchange",
+        "vhost": "/",
+        "destination": "email_queue",
+        "destination_type": "queue",
+        "routing_key": "email_routing_key"
+      }
+    ]
+  }
+  
