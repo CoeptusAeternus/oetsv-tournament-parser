@@ -48,6 +48,7 @@ public class Endpoints {
 
     private static final Logger logger = LoggerFactory.getLogger(Endpoints.class);
 
+    @CrossOrigin
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "List all available Tournaments", description = "Returns a list of all available Tournaments")
     @ApiResponses({
@@ -62,7 +63,8 @@ public class Endpoints {
         return kr.getTournaments();
     }
 
-    @RequestMapping(value = "/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    @RequestMapping(value = "/tournament/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get a specific Tournament", description = "Returns a specific Tournament by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
@@ -82,6 +84,7 @@ public class Endpoints {
         return tr.readTournament(Long.valueOf(tournamentId));
     }
 
+    @CrossOrigin
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler({EmptyTournamentException.class})
     public Map<String, String> handleEmptyTournamentException(EmptyTournamentException ex) {
@@ -91,6 +94,7 @@ public class Endpoints {
         return errorMap;
     }
 
+    @CrossOrigin
     @ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT)
     @ExceptionHandler({IAmATeapotException.class})
     public Map<String, String> handleTeapot() {
