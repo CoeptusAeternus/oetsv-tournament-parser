@@ -39,12 +39,15 @@ public class TournamentListProxyWithMailer implements IKalenderProxy {
         for(ShortTournament st : currentTournaments){
             if( !reader.isNotified(st.getId()) ){
                 reader.addNotified(st.getId());
-                logger.info("Sending Mail with new Tournament: "+st.getBezeichnung());
+
 
                 if(!fileIsEmpty) {
                     mailer.sendMail(st, "sportwart@schwarzgold.at");
+                    logger.info("Sending Mail with new Tournament: "+st.getBezeichnung());
                     mailer.sendMail(st, "jaksei.lol@gmail.com");
                     mailer.sendMail(st, "fiona.gartlgruber@gmail.com");
+                } else {
+                    logger.info("Skipped Mail for new Tournament: {}", st.getBezeichnung());
                 }
             }
         }
