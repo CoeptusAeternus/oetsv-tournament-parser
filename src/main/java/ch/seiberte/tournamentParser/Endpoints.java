@@ -2,6 +2,8 @@ package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.data.ShortTournament;
+import ch.seiberte.tournamentParser.data.health.Status;
+import ch.seiberte.tournamentParser.data.health.StatusResponse;
 import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
 import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
 import ch.seiberte.tournamentParser.proxys.*;
@@ -42,8 +44,46 @@ public class Endpoints {
 
     private static final Logger logger = LoggerFactory.getLogger(Endpoints.class);
 
+    @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Return current Health of API", description = "Gives a short overview over the Status and Health of the API and the parsers")
+    @ApiResponse(responseCode = "200",
+        description = "Health Status and Message",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = StatusResponse.class)
+        )
+    )
+    public StatusResponse getHealth(){
+        Status status = Status.OK;
+        String message = "";
+
+        IKalenderReader calendarReader = new OetsvCalendarDataParser();
+        ITournamentReader tournamentReader = new OetsvTournamentDataParser();
+
+        try {
+            calendarReader.getTournaments();
+        } catch (Exception e) {
+            status = Status.DEGRADED;
+            message = message+e.getMessage()+"\n";
+        }
+
+        try {
+            tournamentReader.readTournament(1500L);
+        } catch (Exception e) {
+
+            status = switch (status) {
+                case OK -> Status.DEGRADED;
+                case DEGRADED -> Status.ERROR;
+                default -> status;
+            };
+
+            message = message+e.getMessage()+"\n";
+        }
+
+        return new StatusResponse(status, message);
+    }
+
     @CrossOrigin
-    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "List all available Tournaments", description = "Returns a list of all available Tournaments")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
@@ -58,7 +98,7 @@ public class Endpoints {
     }
 
     @CrossOrigin
-    @RequestMapping(value = "/tournament/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/tournament/{tournamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get a specific Tournament", description = "Returns a specific Tournament by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
