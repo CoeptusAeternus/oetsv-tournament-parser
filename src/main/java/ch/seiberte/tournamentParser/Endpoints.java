@@ -44,6 +44,44 @@ public class Endpoints {
 
     private static final Logger logger = LoggerFactory.getLogger(Endpoints.class);
 
+    @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Return current Health of API", description = "Gives a short overview over the Status and Health of the API and the parsers")
+    @ApiResponse(responseCode = "200",
+        description = "Health Status and Message",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = StatusResponse.class)
+        )
+    )
+    public StatusResponse getHealth(){
+        Status status = Status.OK;
+        String message = "";
+
+        IKalenderReader calendarReader = new OetsvCalendarDataParser();
+        ITournamentReader tournamentReader = new OetsvTournamentDataParser();
+
+        try {
+            calendarReader.getTournaments();
+        } catch (Exception e) {
+            status = Status.DEGRADED;
+            message = message+e.getMessage()+"\n";
+        }
+
+        try {
+            tournamentReader.readTournament(1500L);
+        } catch (Exception e) {
+
+            status = switch (status) {
+                case OK -> Status.DEGRADED;
+                case DEGRADED -> Status.ERROR;
+                default -> status;
+            };
+
+            message = message+e.getMessage()+"\n";
+        }
+
+        return new StatusResponse(status, message);
+    }
+
     @CrossOrigin
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "List all available Tournaments", description = "Returns a list of all available Tournaments")
