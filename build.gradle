@@ -18,16 +18,16 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.slf4j:slf4j-api:2.0.17'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
 
 	implementation 'org.jsoup:jsoup:1.15.3'
-	implementation 'org.slf4j:slf4j-api:2.0.17'
 
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}
+tasks.named('test') {
+	useJUnitPlatform()
+}
