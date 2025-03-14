@@ -33,12 +33,12 @@ public class OetsvTournamentDataParser implements ITournamentReader {
         try {
             htmlDoc = Jsoup.connect(urlPart1 + id.toString() + urlPart2).get();
         } catch (IOException e) {
-            logger.error("Unable to access URL: "+urlPart1 + id + urlPart2);
+            logger.error("Unable to access URL: {}", (urlPart1 + id + urlPart2) );
             throw new UnableToReadDataException();
         }
 
-        if(htmlDoc.body().text().equals("")) {
-            logger.warn("Could not get Data from Tournament with ID: "+id);
+        if(htmlDoc.body().text().isEmpty()) {
+            logger.warn("Could not get Data from Tournament with ID: {}", id);
             throw new EmptyTournamentException("Tournament not found");
         }
         Element dataBody = htmlDoc.select("table").first().select("tr").get(3);
@@ -88,7 +88,7 @@ public class OetsvTournamentDataParser implements ITournamentReader {
             if (nenngeldAmountMatcher.find())
                 return nenngeldAmountMatcher.group(0);
             else {
-                logger.info("Could not process Nenngeld in String: "+data);
+                logger.info("Could not process Nenngeld in String: {}", data);
                 return "Nenngeld konnte nicht verarbeitet werden. Bitte in Ausschreibung nachlesen";
             }
 

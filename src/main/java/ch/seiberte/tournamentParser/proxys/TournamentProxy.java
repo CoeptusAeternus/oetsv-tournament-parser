@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class TournamentProxy implements ITournamentReader {
 
-    protected Map<Long, LongTournament> tournamentCache;
+    protected final Map<Long, LongTournament> tournamentCache;
     protected final ITournamentReader baseService;
 
     public TournamentProxy() {

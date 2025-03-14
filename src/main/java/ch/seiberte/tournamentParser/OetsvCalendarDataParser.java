@@ -46,7 +46,7 @@ public class OetsvCalendarDataParser implements IKalenderReader {
 
 
             Elements links = columns.get(4).getElementsByTag("a");//verify Tournament has a Ausschreibung
-            if (links.size() != 0)
+            if (!links.isEmpty())
                 if (links.first().text().equals("Ausschreibung")) {
                     Element date = columns.get(0);
                     String dateString = date.text();
