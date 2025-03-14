@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +27,7 @@ public class OetsvTournamentDataParser implements ITournamentReader {
     private static final String urlPart2 = "&art=IN&conf_html=1";
 
     @Override
-    public LongTournament readTournament(Long id) {
+    public LongTournament readTournament(Long id) throws UnableToReadDataException {
 
         Document htmlDoc;
 
@@ -41,25 +42,39 @@ public class OetsvTournamentDataParser implements ITournamentReader {
             logger.warn("Could not get Data from Tournament with ID: {}", id);
             throw new EmptyTournamentException("Tournament not found");
         }
-        Element dataBody = htmlDoc.select("table").first().select("tr").get(3);
+
+        Optional<Element> table = Optional.ofNullable(htmlDoc.select("table").first());
+        if( table.isEmpty() )
+            throw new UnableToReadDataException("No table found");
+
+        Optional<Element> dataBody = Optional.ofNullable(table.get().select("tr").get(3));
+        if( dataBody.isEmpty() )
+            throw new UnableToReadDataException("Do Table Row found at index 3");
 
         String rawAdressString = htmlDoc.select("td").get(8).text();
         String address = rawAdressString.substring(0, rawAdressString.length() - 16);
 
-        String bezeichnung = dataBody.select("td").get(4).text();
+        String bezeichnung = dataBody.get().select("td").get(4).text();
 
-        String rawDateTimeString = dataBody.select("td").get(8).text();
+        String rawDateTimeString = dataBody.get().select("td").get(8).text();
         LocalDateTime start = parseDateTimeFromString(rawDateTimeString);
 
-        String nenngeld = parseNenngeld(dataBody.text());
+        String nenngeld = parseNenngeld(dataBody.get().text());
 
         List<String> klassen = new ArrayList<>();
-        Element klassenTable = dataBody.select("td").last();
-        Elements klassenElements = klassenTable.getElementsByTag("b");
-        for (Element klassenElement : klassenElements) {
-            String rawKlassenString = klassenElement.text();
-            String klassenString = rawKlassenString.substring(0, rawKlassenString.length() - 5);
-            klassen.add(klassenString);
+
+        Optional<Element> klassenTable = Optional.ofNullable(dataBody.get().select("td").last());
+
+        if( klassenTable.isPresent()){
+
+            Elements klassenElements = klassenTable.get().getElementsByTag("b");
+
+            for (Element klassenElement : klassenElements) {
+                String rawKlassenString = klassenElement.text();
+                String klassenString = rawKlassenString.substring(0, rawKlassenString.length() - 5);
+                klassen.add(klassenString);
+            }
+
         }
 
 

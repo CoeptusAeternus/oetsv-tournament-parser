@@ -1,6 +1,7 @@
 package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.ShortTournament;
+import ch.seiberte.tournamentParser.exceptions.UnableToReadDataException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,10 +10,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,11 +32,14 @@ public class OetsvCalendarDataParser implements IKalenderReader {
     }
 
 
-    private Collection<ShortTournament> parseTournamentsFromDoc(Document doc) {
+    private Collection<ShortTournament> parseTournamentsFromDoc(Document doc) throws UnableToReadDataException {
         Collection<ShortTournament> tournamentSet = new HashSet<>();
 
-        Element table = doc.select("table").first();
-        Elements rows = table.select("tr");
+        Optional<Element> table = Optional.ofNullable(doc.select("table").first());
+        if( table.isEmpty() )
+            throw new UnableToReadDataException("No table found");
+
+        Elements rows = table.get().select("tr");
 
         for (int i = 1; i < rows.size(); i++) {//skip first row as it contains names for columns
             Element currentRow = rows.get(i);
@@ -46,28 +47,37 @@ public class OetsvCalendarDataParser implements IKalenderReader {
 
 
             Elements links = columns.get(4).getElementsByTag("a");//verify Tournament has a Ausschreibung
-            if (!links.isEmpty())
-                if (links.first().text().equals("Ausschreibung")) {
-                    Element date = columns.get(0);
-                    String dateString = date.text();
-                    DateTimeFormatter europeanFormatter = DateTimeFormatter.ofPattern("dd.MM.yyy");
-                    LocalDate localDate = LocalDate.parse(dateString,europeanFormatter);
+            if (!links.isEmpty()) {
+                Optional<Element> link = Optional.ofNullable(links.first());
 
-                    Element name = columns.get(1).getElementsByTag("b").first();
-                    String nameString = name.text();
+                if (link.isPresent() && link.get().text().equals("Ausschreibung")) {
+                    Optional<Element> date = Optional.ofNullable(columns.first());
+                    if( date.isEmpty() )
+                        continue;
+
+                    String dateString = date.get().text();
+                    DateTimeFormatter europeanFormatter = DateTimeFormatter.ofPattern("dd.MM.yyy");
+                    LocalDate localDate = LocalDate.parse(dateString, europeanFormatter);
+
+                    Optional<Element> name = Optional.ofNullable(columns.get(1).getElementsByTag("b").first());
+                    if( name.isEmpty() )
+                        continue;
+
+                    String nameString = name.get().text();
 
                     Pattern idPattern = Pattern.compile("TKNr=\\d+&");
-                    Matcher idMatcher = idPattern.matcher(links.first().attr("href"));
-                    String tknr ="";
+                    Matcher idMatcher = idPattern.matcher(link.get().attr("href"));
+                    String tknr = "";
                     if (idMatcher.find())
-                         tknr = idMatcher.group(0);
+                        tknr = idMatcher.group(0);
 
-                    String id= tknr.substring(5,tknr.length()-1);
+                    String id = tknr.substring(5, tknr.length() - 1);
 
-                    ShortTournament st = new ShortTournament(Long.valueOf(id),nameString,localDate);
+                    ShortTournament st = new ShortTournament(Long.valueOf(id), nameString, localDate);
 
                     tournamentSet.add(st);
                 }
+            }
         }
 
         return tournamentSet;

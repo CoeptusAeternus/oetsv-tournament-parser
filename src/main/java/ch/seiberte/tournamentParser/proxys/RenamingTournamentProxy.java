@@ -25,33 +25,33 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
 
         if(teile.size()<2)
             return bezeichnung;
-
-        if(isLateinStandardOrKombi(teile.get(0)))
+        
+        if(isLateinStandardOrKombi(teile.getFirst()))
             Collections.swap(teile,0,1);
 
-        if(teile.get(0).matches("[Ww]ien.*"))
+        if(teile.getFirst().matches("[Ww]ien.*"))
             teile.set(0,"Wien");
-        if(teile.get(0).matches("[Bb]urgen.*"))
+        if(teile.getFirst().matches("[Bb]urgen.*"))
             teile.set(0,"Burgenland");
-        if(teile.get(0).matches("[Kk]ärnt.*"))
+        if(teile.getFirst().matches("[Kk]ärnt.*"))
             teile.set(0,"Kärnten");
-        if(teile.get(0).matches("([Nn]ieder.*|N[Öö])"))
+        if(teile.getFirst().matches("([Nn]ieder.*|N[Öö])"))
             teile.set(0,"Niederösterreich");
-        if(teile.get(0).matches("([Oo]ber.*|O[Öö])"))
+        if(teile.getFirst().matches("([Oo]ber.*|O[Öö])"))
             teile.set(0,"Oberösterreich");
-        if(teile.get(0).matches("[Ss]alz.*"))
+        if(teile.getFirst().matches("[Ss]alz.*"))
             teile.set(0,"Salzburg");
-        if(teile.get(0).matches("[Ss]tei.*"))
+        if(teile.getFirst().matches("[Ss]tei.*"))
             teile.set(0,"Steiermark");
-        if(teile.get(0).matches("[Tt]irol.*"))
+        if(teile.getFirst().matches("[Tt]irol.*"))
             teile.set(0,"Tirol");
-        if(teile.get(0).matches("[Vv]ora.*"))
+        if(teile.getFirst().matches("[Vv]ora.*"))
             teile.set(0,"Vorarlberg");
 
         if(teile.get(1).matches("Kombi.*"))
             teile.set(1,"Kombi");
 
-        teile.add(0,"LM");
+        teile.addFirst("LM");
 
         logger.debug(String.join(" ",teile));
 
@@ -85,7 +85,7 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
 
     private String reformatOeM(String bezeichnung){
         List<String> teile = new ArrayList<>(Arrays.asList(bezeichnung.split(" ",3)));
-        return "ÖM" + teile.get(teile.size()-1);
+        return "ÖM" + teile.getLast();
     }
 
     private String reformatStaats(String bezeichnung){
