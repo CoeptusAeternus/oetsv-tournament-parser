@@ -5,6 +5,7 @@ import ch.seiberte.tournamentParser.OetsvCalendarDataParser;
 import ch.seiberte.tournamentParser.data.ShortTournament;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class ListProxy implements IKalenderProxy {
@@ -20,6 +21,6 @@ public class ListProxy implements IKalenderProxy {
     @Override
     public void updateTournaments() {
         currentList = baseService.getTournaments();
-        currentList.sort((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1);
+        currentList.sort( Comparator.comparing(ShortTournament::getStart) );
     }
 }
