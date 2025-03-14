@@ -2,6 +2,8 @@ package ch.seiberte.tournamentParser;
 
 import ch.seiberte.tournamentParser.data.LongTournament;
 import ch.seiberte.tournamentParser.data.ShortTournament;
+import ch.seiberte.tournamentParser.data.health.Status;
+import ch.seiberte.tournamentParser.data.health.StatusResponse;
 import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
 import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
 import ch.seiberte.tournamentParser.proxys.*;
@@ -43,7 +45,7 @@ public class Endpoints {
     private static final Logger logger = LoggerFactory.getLogger(Endpoints.class);
 
     @CrossOrigin
-    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "List all available Tournaments", description = "Returns a list of all available Tournaments")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
@@ -58,7 +60,7 @@ public class Endpoints {
     }
 
     @CrossOrigin
-    @RequestMapping(value = "/tournament/{tournamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/tournament/{tournamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get a specific Tournament", description = "Returns a specific Tournament by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
