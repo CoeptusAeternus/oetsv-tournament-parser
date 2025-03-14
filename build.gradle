@@ -1,36 +1,33 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.7.9' // Or upgrade to 3.4.3 and Java 17
-	id 'io.spring.dependency-management' version '1.1.0'
+	id 'org.springframework.boot' version '3.4.3'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'ch.seiberte'
-version = '1.2'
-sourceCompatibility = '11' // Change to 17 if using Spring Boot 3.x
+version = '2.0'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web' // Removed version
-
+	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-	// Use consistent Jackson versions
-	implementation 'com.fasterxml.jackson.core:jackson-databind'
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'org.jsoup:jsoup:1.15.3'
-	implementation 'org.slf4j:slf4j-api:1.7.36'
+	implementation 'org.slf4j:slf4j-api:2.0.17'
 
-	// Remove jakarta.mail-api, keep only Angus Mail
-	implementation 'org.eclipse.angus:jakarta.mail:2.0.0'
-	implementation 'jakarta.activation:jakarta.activation-api:2.1.2'
-
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
