@@ -60,6 +60,11 @@ public class LongTournament extends BaseTournament{
     }
 
     @Override
+    public int hashCode() {
+        return this.getId().hashCode() * start.hashCode() * this.getBezeichnung().hashCode() * this.getAdresse().hashCode() * this.getNenngeld().hashCode() * this.getKlassen().hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if(obj instanceof LongTournament)
             return super.equals(obj)&&

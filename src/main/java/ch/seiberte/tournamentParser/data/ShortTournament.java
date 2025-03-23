@@ -25,6 +25,11 @@ public class ShortTournament extends BaseTournament{
     }
 
     @Override
+    public int hashCode() {
+        return this.getId().hashCode() * start.hashCode() * this.getBezeichnung().hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if(obj instanceof ShortTournament)
             return super.equals(obj) && start.equals(((ShortTournament) obj).getStart());
