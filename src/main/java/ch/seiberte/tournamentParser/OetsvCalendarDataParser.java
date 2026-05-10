@@ -32,7 +32,7 @@ public class OetsvCalendarDataParser implements IKalenderReader {
     }
 
 
-    private Collection<ShortTournament> parseTournamentsFromDoc(Document doc) throws UnableToReadDataException {
+    Collection<ShortTournament> parseTournamentsFromDoc(Document doc) throws UnableToReadDataException {
         Collection<ShortTournament> tournamentSet = new HashSet<>();
 
         Optional<Element> table = Optional.ofNullable(doc.select("table").first());

@@ -4,37 +4,52 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LongTournament extends BaseTournament{
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String adresse;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Detailed tournament representation including address, start time, fee and classes")
+public class LongTournament extends BaseTournament {
+
+    @Schema(description = "Address of the tournament venue", example = "Mainstreet 1, 8000 Zurich")
+    private String address;
+
+    @Schema(description = "Tournament start date and time", example = "2026-06-12T09:30:00")
     private LocalDateTime start;
-    private String nenngeld;
-    private List<String> klassen;
 
-    public LongTournament(String adresse, String bezeichnung, LocalDateTime start, Long id, String nenngeld, List<String> klassen) {
-        super(id,bezeichnung);
-        this.adresse = adresse;
+    @Schema(description = "Entry fee (human readable, no defined schema)", example = "30,-; 30,00; 30")
+    private String fee;
+
+    @Schema(description = "List of competition classes or categories", example = "[\"U10\", \"U12\"]")
+    private List<String> classes;
+
+    public LongTournament(String address, String name, LocalDateTime start, Long id, String fee,
+            List<String> classes) {
+        super(id, name);
+        this.address = address;
         this.start = start;
-        this.nenngeld=nenngeld;
-        this.klassen = klassen;
+        this.fee = fee;
+        this.classes = classes;
     }
 
     public LongTournament() {
         super();
-        this.adresse = "";
+        this.address = "";
         this.start = LocalDateTime.MIN;
-        this.nenngeld="";
-        this.klassen = new ArrayList<>();
+        this.fee = "";
+        this.classes = new ArrayList<>();
     }
 
-    public String getAdresse() {
-        return adresse;
+    @JsonProperty("address")
+    public String getAddress() {
+        return address;
     }
 
-    public void setAdresse(String adresse) {
-        this.adresse = adresse;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
+    @JsonProperty("start")
     public LocalDateTime getStart() {
         return start;
     }
@@ -43,45 +58,48 @@ public class LongTournament extends BaseTournament{
         this.start = start;
     }
 
-    public List<String> getKlassen() {
-        return klassen;
+    @JsonProperty("classes")
+    public List<String> getClasses() {
+        return classes;
     }
 
-    public void setKlassen(List<String> klassen) {
-        this.klassen = klassen;
+    public void setClasses(List<String> classes) {
+        this.classes = classes;
     }
 
-    public String getNenngeld() {
-        return nenngeld;
+    @JsonProperty("fee")
+    public String getFee() {
+        return fee;
     }
 
-    public void setNenngeld(String nenngeld) {
-        this.nenngeld = nenngeld;
+    public void setFee(String fee) {
+        this.fee = fee;
     }
 
     @Override
     public int hashCode() {
-        return this.getId().hashCode() * start.hashCode() * this.getBezeichnung().hashCode() * this.getAdresse().hashCode() * this.getNenngeld().hashCode() * this.getKlassen().hashCode();
+        return this.getId().hashCode() * start.hashCode() * this.getName().hashCode()
+                * this.getAddress().hashCode() * this.getFee().hashCode() * this.getClasses().hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof LongTournament)
-            return super.equals(obj)&&
-                    adresse.equals(((LongTournament) obj).getAdresse())&&
-                    start.equals(((LongTournament) obj).getStart())&&
-                    nenngeld.equals(((LongTournament) obj).getNenngeld())&&
-                    klassen.equals(((LongTournament) obj).getKlassen());
+        if (obj instanceof LongTournament)
+            return super.equals(obj) &&
+                    address.equals(((LongTournament) obj).getAddress()) &&
+                    start.equals(((LongTournament) obj).getStart()) &&
+                    fee.equals(((LongTournament) obj).getFee()) &&
+                    classes.equals(((LongTournament) obj).getClasses());
         return false;
     }
 
     @Override
-    public String toString(){
-        return "id: "+getId()+
-                ";bez: "+getBezeichnung()+
-                ";adr: "+getAdresse()+
-                ";start: "+getStart().toString()+
-                ";nenngeld: "+getNenngeld()+
-                ";klassen: "+getKlassen();
+    public String toString() {
+        return "id: " + getId() +
+                ";name: " + getName() +
+                ";address: " + getAddress() +
+                ";start: " + getStart().toString() +
+                ";fee: " + getFee() +
+                ";classes: " + getClasses();
     }
 }
