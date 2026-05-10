@@ -37,6 +37,10 @@ public class OetsvTournamentDataParser implements ITournamentReader {
             logger.error("Unable to access URL: {}", (urlPart1 + id + urlPart2) );
             throw new UnableToReadDataException();
         }
+        return parseTournamentFromDoc(htmlDoc, id);
+    }
+
+    LongTournament parseTournamentFromDoc(Document htmlDoc, Long id) throws UnableToReadDataException {
 
         if(htmlDoc.body().text().isEmpty()) {
             logger.warn("Could not get Data from Tournament with ID: {}", id);

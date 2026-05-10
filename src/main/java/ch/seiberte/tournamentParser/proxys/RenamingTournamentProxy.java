@@ -15,6 +15,14 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
 
     private static final Logger logger = LoggerFactory.getLogger(RenamingTournamentProxy.class);
 
+    public RenamingTournamentProxy() {
+        super();
+    }
+
+    public RenamingTournamentProxy(ITournamentReader baseService) {
+        super(baseService);
+    }
+
     private boolean isLateinStandardOrKombi(String str){
         return str.matches("Latein.*")||str.matches("Standard.*")||str.matches("Kombi.*");
     }
