@@ -35,13 +35,14 @@ Thumbs.db
 ################
 *~
 *.swp
+.vscode/
 
 # Gradle Files #
 ################
 .gradle
 .m2
 
-# Build output directies
+# Build output directories
 /target
 */target
 /build
