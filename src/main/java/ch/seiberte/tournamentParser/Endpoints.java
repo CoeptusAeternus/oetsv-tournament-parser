@@ -39,12 +39,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.annotations.servers.ServerVariable;
 
 @Configuration
 @EnableScheduling
 @RestController
 @OpenAPIDefinition(info = @Info(title = "Tournament Parser API", version = "1.0", description = "API to list and read tournament information"), servers = {
-        @Server(url = "http://localhost:12001", description = "Primary HTTP server") })
+        @Server(url = "http://localhost:{serverPort}", description = "Primary HTTP server", variables = {
+                @ServerVariable(name = "serverPort", description = "Matches the SERVER_PORT environment variable", defaultValue = "12001") }) })
 public class Endpoints {
 
     private final ITournamentReader tr;
