@@ -1,19 +1,10 @@
 package ch.seiberte.tournamentParser;
 
-import ch.seiberte.tournamentParser.data.LongTournament;
-import ch.seiberte.tournamentParser.data.ShortTournament;
-import ch.seiberte.tournamentParser.data.health.Status;
-import ch.seiberte.tournamentParser.data.health.StatusResponse;
-import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
-import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
-import ch.seiberte.tournamentParser.proxys.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -22,12 +13,29 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import ch.seiberte.tournamentParser.data.LongTournament;
+import ch.seiberte.tournamentParser.data.ShortTournament;
+import ch.seiberte.tournamentParser.data.health.Status;
+import ch.seiberte.tournamentParser.data.health.StatusResponse;
+import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
+import ch.seiberte.tournamentParser.exceptions.IAmATeapotException;
+import ch.seiberte.tournamentParser.proxys.IKalenderProxy;
+import ch.seiberte.tournamentParser.proxys.ListProxy;
+import ch.seiberte.tournamentParser.proxys.RenamingTournamentProxy;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @Configuration
 @EnableScheduling
@@ -46,13 +54,8 @@ public class Endpoints {
 
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Return current Health of API", description = "Gives a short overview over the Status and Health of the API and the parsers")
-    @ApiResponse(responseCode = "200",
-        description = "Health Status and Message",
-        content = @Content(mediaType = "application/json",
-            schema = @Schema(implementation = StatusResponse.class)
-        )
-    )
-    public StatusResponse getHealth(){
+    @ApiResponse(responseCode = "200", description = "Health Status and Message", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StatusResponse.class)))
+    public StatusResponse getHealth() {
         Status status = Status.OK;
         String message = "";
 
@@ -63,7 +66,7 @@ public class Endpoints {
             calendarReader.getTournaments();
         } catch (Exception e) {
             status = Status.DEGRADED;
-            message = message+e.getMessage()+"\n";
+            message = message + e.getMessage() + "\n";
         }
 
         try {
@@ -76,43 +79,34 @@ public class Endpoints {
                 default -> status;
             };
 
-            message = message+e.getMessage()+"\n";
+            message = message + e.getMessage() + "\n";
         }
 
         return new StatusResponse(status, message);
     }
 
     @CrossOrigin
-    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/tournaments", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "List all available Tournaments", description = "Returns a list of all available Tournaments")
     @ApiResponses({
-            @ApiResponse(responseCode = "200",
-                    description = "List of Tournaments found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = ShortTournament.class)))
-            )
+            @ApiResponse(responseCode = "200", description = "List of Tournaments found", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ShortTournament.class))))
     })
     public List<ShortTournament> returnList() {
-        logger.info("request at /list");
+        logger.info("request at /tournaments");
         return kr.getTournaments();
     }
 
     @CrossOrigin
-    @GetMapping(value = "/tournament/{tournamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/tournaments/{tournamentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get a specific Tournament", description = "Returns a specific Tournament by ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200",
-                    description = "Tournament found",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LongTournament.class))),
-            @ApiResponse(responseCode = "400", description = "Tournament not found")
+            @ApiResponse(responseCode = "200", description = "Tournament found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LongTournament.class))),
+            @ApiResponse(responseCode = "404", description = "Tournament not found")
     })
     public LongTournament returnTournament(
-            @Parameter(description = "ID of the Tournament to be found", required = true)
-            @Validated @PathVariable String tournamentId) {
-        logger.info("request at TournamentID: {}", tournamentId
-        );
-        if(tournamentId.equals("418"))
+            @Parameter(description = "ID of the Tournament to be found", required = true) @Validated @PathVariable String tournamentId) {
+        logger.info("request at TournamentID: {}", tournamentId);
+        if (tournamentId.equals("418"))
             throw new IAmATeapotException();
 
         return tr.readTournament(Long.valueOf(tournamentId));
@@ -120,7 +114,7 @@ public class Endpoints {
 
     @CrossOrigin
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({EmptyTournamentException.class})
+    @ExceptionHandler({ EmptyTournamentException.class })
     public Map<String, String> handleEmptyTournamentException(EmptyTournamentException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("status", HttpStatus.BAD_REQUEST.value() + "");
@@ -130,15 +124,16 @@ public class Endpoints {
 
     @CrossOrigin
     @ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT)
-    @ExceptionHandler({IAmATeapotException.class})
+    @ExceptionHandler({ IAmATeapotException.class })
     public Map<String, String> handleTeapot() {
         Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("status", HttpStatus.I_AM_A_TEAPOT.value()+"");
-        errorMap.put("message", "Unable to provide Coffee - Available selection includes Yorkshire Tea, Green Tea and fruit tea");
+        errorMap.put("status", HttpStatus.I_AM_A_TEAPOT.value() + "");
+        errorMap.put("message",
+                "Unable to provide Coffee - Available selection includes Yorkshire Tea, Green Tea and fruit tea");
         return errorMap;
     }
 
-    //This updates only the Cache of all Tournaments
+    // This updates only the Cache of all Tournaments
     @Scheduled(fixedRate = 3600000)
     public void updateCollectionAndMap() {
         logger.info("updating Cache for  all tournaments");
