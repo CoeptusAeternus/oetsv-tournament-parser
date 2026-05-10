@@ -1,16 +1,5 @@
 package ch.seiberte.tournamentParser;
 
-import ch.seiberte.tournamentParser.data.LongTournament;
-import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
-import ch.seiberte.tournamentParser.exceptions.UnableToReadDataException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +8,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.seiberte.tournamentParser.data.LongTournament;
+import ch.seiberte.tournamentParser.exceptions.EmptyTournamentException;
+import ch.seiberte.tournamentParser.exceptions.UnableToReadDataException;
 
 public class OetsvTournamentDataParser implements ITournamentReader {
 
@@ -54,12 +54,12 @@ public class OetsvTournamentDataParser implements ITournamentReader {
         String rawAdressString = htmlDoc.select("td").get(8).text();
         String address = rawAdressString.substring(0, rawAdressString.length() - 16);
 
-        String bezeichnung = dataBody.get().select("td").get(4).text();
+        String name = dataBody.get().select("td").get(4).text();
 
         String rawDateTimeString = dataBody.get().select("td").get(8).text();
         LocalDateTime start = parseDateTimeFromString(rawDateTimeString);
 
-        String nenngeld = parseNenngeld(dataBody.get().text());
+        String fee = parseFee(dataBody.get().text());
 
         List<String> klassen = new ArrayList<>();
 
@@ -78,7 +78,7 @@ public class OetsvTournamentDataParser implements ITournamentReader {
         }
 
 
-        return new LongTournament(address, bezeichnung, start, id, nenngeld, klassen);
+        return new LongTournament(address, name, start, id, fee, klassen);
     }
 
     private LocalDateTime parseDateTimeFromString(String dateTime) {
@@ -90,21 +90,21 @@ public class OetsvTournamentDataParser implements ITournamentReader {
         return LocalDateTime.parse(rawDateString, oetsvDateTimePattern);
     }
 
-    private String parseNenngeld(String data) {
-        Pattern nenngeldSearchPattern = Pattern.compile("Nenngeld:?(\\s|\\w|€)*\\d+(,(\\d{2}|-)|)");
-        Matcher nenngeldMatcher = nenngeldSearchPattern.matcher(data);
+    private String parseFee(String data) {
+        Pattern feeSearchPattern = Pattern.compile("Nenngeld:?(\\s|\\w|€)*\\d+(,(\\d{2}|-)|)");
+        Matcher feeMatcher = feeSearchPattern.matcher(data);
 
-        if (nenngeldMatcher.find()) {
+        if (feeMatcher.find()) {
 
-            String nenngeldFound = nenngeldMatcher.group(0);
-            Pattern nenngeldAmountPattern = Pattern.compile("\\d+(,(\\d{2}|-)|)");
-            Matcher nenngeldAmountMatcher = nenngeldAmountPattern.matcher(nenngeldFound);
+            String feeFound = feeMatcher.group(0);
+            Pattern feeAmountPattern = Pattern.compile("\\d+(,(\\d{2}|-)|)");
+            Matcher feeAmountMatcher = feeAmountPattern.matcher(feeFound);
 
-            if (nenngeldAmountMatcher.find())
-                return nenngeldAmountMatcher.group(0);
+            if (feeAmountMatcher.find())
+                return feeAmountMatcher.group(0);
             else {
-                logger.info("Could not process Nenngeld in String: {}", data);
-                return "Nenngeld konnte nicht verarbeitet werden. Bitte in Ausschreibung nachlesen";
+                logger.info("Could not process fee in String: {}", data);
+                return "Fee could not be parsed. Please check the event listing.";
             }
 
         } else
