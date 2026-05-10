@@ -1,14 +1,15 @@
 package ch.seiberte.tournamentParser.proxys;
 
-import ch.seiberte.tournamentParser.ITournamentReader;
-import ch.seiberte.tournamentParser.data.LongTournament;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.seiberte.tournamentParser.ITournamentReader;
+import ch.seiberte.tournamentParser.data.LongTournament;
 
 public class RenamingTournamentProxy extends TournamentProxy implements ITournamentReader {
 
@@ -18,13 +19,13 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
         return str.matches("Latein.*")||str.matches("Standard.*")||str.matches("Kombi.*");
     }
 
-    private String reformatLM(String bezeichnung){
-        List<String> teile = new ArrayList<>(Arrays.asList(bezeichnung.split(" ",3)));
+    private String reformatLM(String name){
+        List<String> teile = new ArrayList<>(Arrays.asList(name.split(" ",3)));
 
         teile.remove("Landesmeisterschaft");
 
         if(teile.size()<2)
-            return bezeichnung;
+            return name;
         
         if(isLateinStandardOrKombi(teile.getFirst()))
             Collections.swap(teile,0,1);
@@ -58,78 +59,78 @@ public class RenamingTournamentProxy extends TournamentProxy implements ITournam
         return String.join(" ",teile);
     }
 
-    private String reformatSeniorenLM(String bezeichnung){
+    private String reformatSeniorenLM(String name){
 
-        if(bezeichnung.matches(".*[Ww]ien.*"))
+        if(name.matches(".*[Ww]ien.*"))
             return "LM Wien Senioren";
-        if(bezeichnung.matches(".*[Bb]urgen.*"))
+        if(name.matches(".*[Bb]urgen.*"))
             return "LM Burgenland Senioren";
-        if(bezeichnung.matches(".*[Kk]ärnt.*"))
+        if(name.matches(".*[Kk]ärnt.*"))
             return "LM Kärnten Senioren";
-        if(bezeichnung.matches("([Nn]ieder.*|.*N[Öö].*)"))
+        if(name.matches("([Nn]ieder.*|.*N[Öö].*)"))
             return "LM Niederösterreich Senioren";
-        if(bezeichnung.matches("([Oo]ber.*|.*O[Öö].*)"))
+        if(name.matches("([Oo]ber.*|.*O[Öö].*)"))
             return "LM Oberösterreich Senioren";
-        if(bezeichnung.matches(".*[Ss]alz.*"))
+        if(name.matches(".*[Ss]alz.*"))
             return "LM Salzburg Senioren";
-        if(bezeichnung.matches(".*[Ss]tei.*"))
+        if(name.matches(".*[Ss]tei.*"))
             return "LM Steiermark Senioren";
-        if(bezeichnung.matches(".*[Tt]irol.*"))
+        if(name.matches(".*[Tt]irol.*"))
             return "LM Tirol Senioren";
-        if(bezeichnung.matches(".*[Vv]ora.*"))
+        if(name.matches(".*[Vv]ora.*"))
             return "LM Vorarlberg Senioren";
 
 
-        return bezeichnung;
+        return name;
     }
 
-    private String reformatOeM(String bezeichnung){
-        List<String> teile = new ArrayList<>(Arrays.asList(bezeichnung.split(" ",3)));
+    private String reformatOeM(String name){
+        List<String> teile = new ArrayList<>(Arrays.asList(name.split(" ",3)));
         return "ÖM" + teile.getLast();
     }
 
-    private String reformatStaats(String bezeichnung){
-        if(bezeichnung.matches(".*Staatsmeisterschaft(en)? (Latein|Standard|Kombi.*)")){
-            String neueBezeichnung = "Staats ";
-            if(bezeichnung.matches(".*Latein.*"))
-                neueBezeichnung=neueBezeichnung+"Latein";
-            if(bezeichnung.matches(".*Standard.*"))
-                neueBezeichnung=neueBezeichnung+"Standard";
-            if(bezeichnung.matches(".*Kombi.*"))
-                neueBezeichnung=neueBezeichnung+"Kombi";
+    private String reformatStaats(String name){
+        if(name.matches(".*Staatsmeisterschaft(en)? (Latein|Standard|Kombi.*)")){
+            String newName = "Staats ";
+            if(name.matches(".*Latein.*"))
+                newName=newName+"Latein";
+            if(name.matches(".*Standard.*"))
+                newName=newName+"Standard";
+            if(name.matches(".*Kombi.*"))
+                newName=newName+"Kombi";
 
-            return neueBezeichnung;
+            return newName;
         }
 
-        return bezeichnung;
+        return name;
     }
 
     @Override
     protected void addTournamentToCache(Long id){
         LongTournament newTournament = baseService.readTournament(id);
 
-        if(newTournament.getBezeichnung().matches(".*Landesmeisterschaft.*")){
+        if(newTournament.getName().matches(".*Landesmeisterschaft.*")){
             logger.info("Changing Tournament Name for LT with id:{} (LM)", id);
-            String neueBezeichnung = reformatLM(newTournament.getBezeichnung());
-            newTournament.setBezeichnung(neueBezeichnung);
+            String newName = reformatLM(newTournament.getName());
+            newTournament.setName(newName);
         }
 
-        if(newTournament.getBezeichnung().matches(".*Österreichische Meisterschaft.*")){
+        if(newTournament.getName().matches(".*Österreichische Meisterschaft.*")){
             logger.info("Changing Tournament Name for LT with id:{} (ÖM)", id);
-            String neueBezeichnung = reformatOeM(newTournament.getBezeichnung());
-            newTournament.setBezeichnung(neueBezeichnung);
+            String newName = reformatOeM(newTournament.getName());
+            newTournament.setName(newName);
         }
 
-        if(newTournament.getBezeichnung().matches(".*Staatsmeisterschaft.*")){
+        if(newTournament.getName().matches(".*Staatsmeisterschaft.*")){
             logger.info("Changing Tournament Name for LT with id:{} (Staats)", id);
-            String neueBezeichnung = reformatStaats(newTournament.getBezeichnung());
-            newTournament.setBezeichnung(neueBezeichnung);
+            String newName = reformatStaats(newTournament.getName());
+            newTournament.setName(newName);
         }
 
-        if(newTournament.getBezeichnung().matches(".*Meisterschaft.*Senioren.*")){
+        if(newTournament.getName().matches(".*Meisterschaft.*Senioren.*")){
             logger.info("Changing Tournament Name for LT with id:{} (LM Senioren)", id);
-            String neueBezeichnung = reformatSeniorenLM(newTournament.getBezeichnung());
-            newTournament.setBezeichnung(neueBezeichnung);
+            String newName = reformatSeniorenLM(newTournament.getName());
+            newTournament.setName(newName);
         }
 
         tournamentCache.put(newTournament.getId(), newTournament);
