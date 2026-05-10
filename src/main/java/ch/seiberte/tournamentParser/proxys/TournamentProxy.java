@@ -13,8 +13,16 @@ public class TournamentProxy implements ITournamentReader {
     protected final ITournamentReader baseService;
 
     public TournamentProxy() {
-        this.tournamentCache =new HashMap<>();
-        this.baseService=new OetsvTournamentDataParser();
+        this(new HashMap<>(), new OetsvTournamentDataParser());
+    }
+
+    public TournamentProxy(ITournamentReader baseService) {
+        this(new HashMap<>(), baseService);
+    }
+
+    protected TournamentProxy(Map<Long, LongTournament> tournamentCache, ITournamentReader baseService) {
+        this.tournamentCache = tournamentCache;
+        this.baseService = baseService;
     }
 
     protected void addTournamentToCache(Long id){
