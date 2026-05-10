@@ -59,6 +59,7 @@ jobs:
           fi
 
           printf 'VERSION=%s\n' "$version" >> "$GITHUB_ENV"
+          printf 'GHCR_OWNER=%s\n' "$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -99,8 +100,8 @@ jobs:
           tags: |
             ${{ env.DOCKERHUB_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
             ${{ env.DOCKERHUB_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ env.GHCR_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+            ghcr.io/${{ env.GHCR_OWNER }}/${{ env.IMAGE_NAME }}:latest
 
           labels: |
             org.opencontainers.image.version=${{ env.VERSION }}
