@@ -1,0 +1,39 @@
+{
+	"name": "Java/Spring Boot",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/git:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack",
+				"vmware.vscode-spring-boot",
+				"vscjava.vscode-java-test"
+			],
+			"settings": {
+				"java.home": "",
+				"[java]": {
+					"editor.defaultFormatter": "redhat.java",
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.organizeImports": "explicit"
+					}
+				},
+				"spring-boot.ls.java.home": "",
+				"spring-boot.ls.logfile": "/tmp/spring-boot-ls.log"
+			}
+		}
+	},
+	"forwardPorts": [12001],
+	"portsAttributes": {
+		"12001": {
+			"label": "Spring Boot App",
+			"onAutoForward": "notify"
+		}
+	},
+	"postCreateCommand": "chmod +x ./gradlew && ./gradlew build --no-daemon",
+	"remoteUser": "vscode"
+}
