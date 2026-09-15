@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
@@ -129,11 +130,10 @@ public class Endpoints {
     }
 
     @CrossOrigin
-    @ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT)
     @ExceptionHandler({ IAmATeapotException.class })
-    public ErrorResponse handleTeapot() {
-        return new ErrorResponse(HttpStatus.I_AM_A_TEAPOT.value(),
-                "Unable to provide coffee. Available selection includes Yorkshire Tea, Green Tea and fruit tea");
+    public ResponseEntity<ErrorResponse> handleTeapot() {
+        return ResponseEntity.status(418).body(new ErrorResponse(418,
+                "Unable to provide coffee. Available selection includes Yorkshire Tea, Green Tea and fruit tea"));
     }
 
     // This updates only the Cache of all Tournaments
