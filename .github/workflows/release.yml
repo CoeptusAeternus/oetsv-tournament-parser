@@ -49,6 +49,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
       - name: Resolve release version
         shell: bash
         run: |
@@ -61,25 +71,6 @@ jobs:
           printf 'VERSION=%s\n' "$version" >> "$GITHUB_ENV"
           printf 'GHCR_OWNER=%s\n' "$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: coeptus
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Store release version artifact
         run: |
           printf '%s\n' "${VERSION}" > release-version.txt
@@ -90,20 +81,20 @@ jobs:
           name: release-version
           path: release-version.txt
 
-      - name: Build and push multi-arch images
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
+      - name: Publish image to Docker Hub with Gradle Jib
+        run: >-
+          ./gradlew jib --no-daemon
+          -Djib.to.image=${{ env.DOCKERHUB_NAMESPACE }}/${{ env.IMAGE_NAME }}
+          -Djib.to.tags=${{ env.VERSION }},latest
+          -Djib.to.auth.username=coeptus
+          -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
+          -Djib.container.labels=org.opencontainers.image.version=${{ env.VERSION }},org.opencontainers.image.revision=${{ github.sha }},org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
-          tags: |
-            ${{ env.DOCKERHUB_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-            ${{ env.DOCKERHUB_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest
-            ghcr.io/${{ env.GHCR_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
-            ghcr.io/${{ env.GHCR_OWNER }}/${{ env.IMAGE_NAME }}:latest
-
-          labels: |
-            org.opencontainers.image.version=${{ env.VERSION }}
-            org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+      - name: Publish image to GHCR with Gradle Jib
+        run: >-
+          ./gradlew jib --no-daemon
+          -Djib.to.image=ghcr.io/${{ env.GHCR_OWNER }}/${{ env.IMAGE_NAME }}
+          -Djib.to.tags=${{ env.VERSION }},latest
+          -Djib.to.auth.username=${{ github.actor }}
+          -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}
+          -Djib.container.labels=org.opencontainers.image.version=${{ env.VERSION }},org.opencontainers.image.revision=${{ github.sha }},org.opencontainers.image.source=https://github.com/${{ github.repository }}

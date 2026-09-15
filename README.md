@@ -58,20 +58,16 @@ SERVER_PORT=8080 ./gradlew bootRun
 
 The OpenAPI definition advertises `http://localhost:{serverPort}` as the primary server URL, with `serverPort` defaulting to `12001` and matching the `SERVER_PORT` environment variable. If you change the port, Swagger UI will show the same value.
 
-## Docker Containers
+## Container Images
 
-### Application container
-
-The top-level `Dockerfile` builds a two-stage image:
-
-1. A Gradle build stage compiles the app and creates the boot JAR.
-2. A slim Eclipse Temurin 21 JRE stage runs the JAR.
-
-Build the image:
+Build the application image with Gradle Jib:
 
 ```bash
-docker build -t tournament-parser .
+./gradlew jibDockerBuild -Djib.to.image=tournament-parser
 ```
+
+The image runs as a dedicated non-root user (`65532:65532`) and listens on the
+unprivileged port `12001`.
 
 Run the container:
 
