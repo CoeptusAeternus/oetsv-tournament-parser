@@ -16,7 +16,7 @@ The application also exposes OpenAPI metadata and Swagger UI for interactive API
 
 Requirements:
 
-- Java 21
+- Java 25
 - A shell with execute permission for `gradlew`
 
 Start the app with:
@@ -93,7 +93,7 @@ To use it:
 
 The dev container:
 
-- Uses a Java 21 Bookworm base image
+- Uses a Java 25 Bookworm base image
 - Forwards port `12001`
 - Installs Java/Spring Boot tooling extensions
 - Runs `./gradlew build --no-daemon` after creation

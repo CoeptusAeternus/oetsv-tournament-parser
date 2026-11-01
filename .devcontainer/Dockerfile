@@ -1,3 +1,3 @@
-FROM mcr.microsoft.com/devcontainers/java:21-bookworm
+FROM mcr.microsoft.com/devcontainers/java:25-bookworm
 
 WORKDIR /workspace
